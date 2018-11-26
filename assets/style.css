@@ -1,0 +1,60 @@
+body, html {
+	height:				100%;
+}
+
+body {
+	margin:				0;
+	padding:			0;
+	display:			flex;
+    flex-direction:		column;
+}
+
+#map {
+	position:			relative;
+	right:				0;
+	padding-left:		1px;
+	padding-right:		1px;
+	z-index:			0;
+}
+
+div.hidden {
+	display:			none;
+}
+
+nav {
+	background-color: 	#5f9ea0;
+}
+
+.jumbotron {
+	background-color: #a0d6b4;
+}
+
+.pane {
+	background-color: #fdf9f9;
+}
+
+.slider-selection {
+	background: #BABABA;
+}
+
+.progress {
+	height: 50px;
+}
+
+.progress-bar-animated {
+	width: 100%;
+}
+
+/* Can't get shadow to work without disabling click events on Mapbox GL */
+/*
+.shad:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+*/

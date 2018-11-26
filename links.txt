@@ -1,0 +1,11 @@
+Mapbox GL / Bootstrap
+https://github.com/charliedotau/mapbox-gl-js-bootstrap-boilerplate
+
+Bootstrap fixed nav with flexible container below
+https://www.codeply.com/go/dTaVyMah1U
+
+Boostrap three columns, middle flex (Holy Grail)
+https://www.codeply.com/go/KbmvdqO8OM/bootstrap-4-holy-grail-layout
+
+Better nav solution
+https://www.codeply.com/go/fKNRvG0Hak
