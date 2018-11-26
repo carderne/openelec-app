@@ -1,0 +1,7 @@
+#npm run build
+
+npm run dev
+
+cp dist/index.html ../openelec_app/openelec_app/templates/
+cp dist/main.js ../openelec_app/openelec_app/static/
+echo "Copied to ../openelec_app/openelec_app/static/"
