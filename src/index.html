@@ -29,7 +29,7 @@
   <!-- Middle button group -->
   <div class="btn-group justify-content-center order-2" data-toggle="buttons">
     <button type="button" class="btn" id="go-plan">Plan pathways</button>
-    <button type="button" class="btn" id="go-find">Find opportunities</button>
+    <button type="button" class="btn disabled" id="go-find">Find opportunities</button>
   </div>
 
   <!-- Right aligned links -->
@@ -54,7 +54,7 @@
       <p>OpenElec is the best tool for creating national electrification plans and finding private sector off-grid elecrification opportunities.</p>
       <p>Choose one below:</p>
       <button type="button" class="btn btn-primary btn-lg" id="go-plan-big">Plan pathways</button>
-      <button type="button" class="btn btn-primary btn-lg" id="go-find-big">Find opportunities</button>
+      <button type="button" class="btn btn-primary btn-lg disabled" id="go-find-big">Find opportunities</button>
     </div>
   </div>
 
@@ -74,18 +74,19 @@
       <h5 class="ml-3 hidden-sm-down text">Lesotho</h5>
       <button type="button" class="btn btn-primary btn-sm" id="run-model">Run model</button>
       <button type="button" class="btn btn-secondary btn-sm disabled">Change country</button>
-      <div class="py-3">
-        <span id="slider-grid-dist-label">Parameter: <span id="slider-grid-dist-val">500</span></span>
-        <input id="slider-grid-dist" type="text" data-slider-min="0" data-slider-max="5000" data-slider-step="500" data-slider-value="1000"/>
-      </div>
+      <div class="py-3" id="sliders"></div>
     </div>
 
     <!-- Central flexible pane for map -->
     <div class="col fluid px-0" id="map"></div>
+    <div class='map-overlay top hidden' id='map-announce-outer'>
+      <div class='map-overlay-inner' id='map-announce'></div>
+    </div>
 
     <!-- Right fixed pane for summary result display -->
     <div class="col-sm-2 fixed py-3 shad pane">
-      <h5 class="text">Results</h5>
+      <h5 class="text">Summary results</h5>
+      <div id="summary"></div>
     </div>
   </div>
 </div>
