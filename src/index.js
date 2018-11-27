@@ -85,6 +85,16 @@ function createMap() {
           "line-width": 3
         }
       });
+
+      // Change the cursor to a pointer when the mouse is over the states layer.
+      map.on('mouseenter', 'clusters', function () {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', 'clusters', function () {
+        map.getCanvas().style.cursor = '';
+      });
     }
   });
 }
@@ -104,10 +114,45 @@ function run() {
     show('map-announce-outer')
   } else if (activeModel == 'plan-loc') {
     runMgo();
+  } else if (activeModel == 'find-nat') {
+    runFindNat();
+    $('#map-announce').html(clickMsg)
+    show('map-announce-outer')
   }
   
 }
 
+function runFindNat() {
+  $.ajax({
+    url: "/find_clusters",
+    data: findNatParams,
+    success: showFindNatResults
+});
+}
+
+var findNatSummary = ''
+function showFindNatResults(data) {
+  map.getSource('clusters').setData(data.clusters);
+  map.setPaintProperty('clusters', 'fill-color', {
+    property: 'score',
+    stops: [[1, '#b2e2e2'], [5, '#006d2c']]
+  });
+  map.on('click', 'clusters', function (e) {
+    var features = map.queryRenderedFeatures(e.point);
+    var bbox = geojsonExtent(features[0].geometry);
+    map.fitBounds(bbox, {padding: 20});
+    getOsmData(bbox)
+  });
+
+  let val = data.summary;
+  let summary = $("#summary");
+
+  summary.html('');
+  summary.append('<p>Clusters found: ' + val.num_clusters + '</p>');
+  planNatSummary = summary.html();
+
+  $('#loading-bar').modal('hide');
+}
 
 /**
  * Run the model with the user-provided input parameters.
@@ -120,7 +165,7 @@ function runElectrify() {
   });
 }
 
-var planNatSummary;
+var planNatSummary = '';
 function showElectrifyResults(data) {
   if (map.getSource("network")) {
     map.getSource('network').setData(data.network);
@@ -142,21 +187,20 @@ function showElectrifyResults(data) {
   }
 
   map.getSource('clusters').setData(data.clusters);
+  map.setPaintProperty('clusters', 'fill-color', [
+    'match',
+    ['get', 'type'],
+    'orig', '#fbb03b',
+    'new', '#223b53',
+    'og', '#e55e5e',
+    '#b2e2e2'
+  ]);
+
   map.on('click', 'clusters', function (e) {
     var features = map.queryRenderedFeatures(e.point);
     var bbox = geojsonExtent(features[0].geometry);
     map.fitBounds(bbox, {padding: 20});
     getOsmData(bbox)
-  });
-
-  // Change the cursor to a pointer when the mouse is over the states layer.
-  map.on('mouseenter', 'clusters', function () {
-    map.getCanvas().style.cursor = 'pointer';
-  });
-
-  // Change it back to a pointer when it leaves.
-  map.on('mouseleave', 'clusters', function () {
-    map.getCanvas().style.cursor = '';
   });
 
   let val = data.summary;
@@ -213,6 +257,7 @@ function prepForMgoRun() {
     success: planLocSliders
   });
   $("#summary").html(planLocSummary);
+  $('#run-model').html('Run model')
 }
 
 
@@ -309,6 +354,38 @@ function explore() {
   map.resize();
 }
 
+var findNatParams = {};
+function findNatSliders(data) {
+  let slider_vals = data.config;
+  let sliders = $("#sliders");
+
+  sliders.html('');
+  for (var row in slider_vals) {
+    let vals = slider_vals[row];
+    let name = vals.name;
+    let label = vals.label;
+    let unit = vals.unit;
+    let min = parseFloat(vals.min);
+    let max = parseFloat(vals.max);
+    let step = parseFloat(vals.step);
+    let def = parseFloat(vals.default);
+
+    let sliderId = 'sl-' + name;
+    let sliderValId = 'sl-' + name + '-val';
+    if (!findNatParams[name]) {
+      findNatParams[name] = def;
+    }
+
+    sliders.append('<br><span>' + label + ': <span id="' + sliderValId + '">' + findNatParams[name] + '</span> ' + unit + '</span');
+    sliders.append('<input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + findNatParams[name] + '"/>');
+
+    $('#' + sliderId).slider();
+    $('#' + sliderId).on("slide", function(slideEvt) {
+      $('#' + sliderValId).text(slideEvt.value);
+      findNatParams[name] = parseFloat($('#' + sliderId).val());
+    });
+  }
+}
 
 var planLocParams = {};
 function planLocSliders(data) {
@@ -381,6 +458,7 @@ function plan() {
   //window.history.pushState({}, 'OpenElec | Plan', 'openelec.com/plan');
   activeModel = 'plan-nat';
   activeMode("go-plan");
+  $('#run-model').html('Run model')
 
   $.ajax({
     url: "/get_slider_config",
@@ -392,7 +470,16 @@ function plan() {
 }
 
 function find() {
+  activeModel = 'find-nat';
   activeMode("go-find");
+  $('#run-model').html('Filter')
+
+  $.ajax({
+    url: "/get_slider_config",
+    data: { config_file: 'sliders_find_nat.csv' },
+    success: findNatSliders
+  });
+
   explore();
 }
 
@@ -401,6 +488,7 @@ function home() {
   show("landing");
   hide("explore");
   hide("about");
+  hide('map-announce-outer')
 }
 
 function about() {
@@ -408,6 +496,7 @@ function about() {
   hide("landing");
   hide("explore");
   show("about");
+  hide('map-announce-outer')
 }
 
 function activeMode(mode) {
