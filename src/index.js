@@ -37,8 +37,9 @@ var findNatParams = {};
 var planLocParams = {};
 var planNatParams = {};
 
-// variables for right sidebar summary results
+// variables for right sidebar legend and summary results
 var summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
+var legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 
 // message displayed at national-level display
 var clickMsg = 'Click on a cluster to optimise local network';
@@ -49,7 +50,31 @@ var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
 // keep track of local bounding box
 var bbox;
 
+// to intialise buildings layer before we have the GeoJSON
 var emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
+
+// 
+var layerColors = {
+  'grid': '#474747', // grey
+  'clustersPlan': {
+    'default': '#1d0b1c', //grey
+    'orig': '#377eb8', // blue
+    'new': '#4daf4a', // green
+    'og': '#e41a1c' // red
+  },
+  'clustersFind': {
+    'default': '#1d0b1c', //grey
+    'top': '#9ebcda', // light blue
+    'bottom': '#6e016b' // purple
+  },
+  'network': '#339900', // green
+  'buildings': {
+    'default': '#005824', // dark green
+    'bottom': '#ccece6', // light
+    'top': '#005824' // dark green
+  },
+  'lv': '#4f5283' // grey
+};
 
 // Call init() function on DOM load
 $(document).ready(init);
@@ -115,10 +140,10 @@ function addMapLayers() {
           'fill-color': [
             'match',
             ['get', 'type'],
-            'orig', '#377eb8', // blue
-            'new', '#4daf4a', // green
-            'og', '#e41a1c', // red
-            '#1d0b1c' // default: grey
+            'orig', layerColors.clustersPlan.orig,
+            'new', layerColors.clustersPlan.new,
+            'og', layerColors.clustersPlan.og,
+            layerColors.clustersPlan.default
           ],
           'fill-opacity': 0.5,
         }
@@ -131,10 +156,10 @@ function addMapLayers() {
           'line-color': [
             'match',
             ['get', 'type'],
-            'orig', '#377eb8', // blue
-            'new', '#4daf4a', // green
-            'og', '#e41a1c', // red
-            '#1d0b1c' // default: grey
+            'orig', layerColors.clustersPlan.orig,
+            'new', layerColors.clustersPlan.new,
+            'og', layerColors.clustersPlan.og,
+            layerColors.clustersPlan.default
           ],
           'line-width': 2,
         }
@@ -150,7 +175,7 @@ function addMapLayers() {
           'line-cap': 'round'
         },
         'paint': {
-          'line-color': 'black',
+          'line-color': layerColors.grid,
           'line-width': 2
         }
       });
@@ -161,7 +186,7 @@ function addMapLayers() {
         'type': 'fill',
         'source': 'buildings',
         'paint': {
-          'fill-color': '#005824',
+          'fill-color': layerColors.buildings.default,
           'fill-opacity': 0.8
         }
       });
@@ -205,7 +230,7 @@ function runPlanNat() {
     url: '/run_electrify',
     data: planNatParams,
     success: showPlanNat
-  })
+  });
 }
 
 /**
@@ -250,7 +275,7 @@ function showPlanNat(data) {
         'line-cap': 'round'
       },
       'paint': {
-        'line-color': '#339900',
+        'line-color': layerColors.network,
         'line-width': 3
       }
     });
@@ -277,7 +302,7 @@ function showPlanLoc(data) {
   map.getSource('buildings').setData(data.buildings);
   map.setPaintProperty('buildings', 'fill-color', {
     property: 'area',
-    stops: [[1, '#ccece6'], [100, '#005824']]
+    stops: [[1, layerColors.buildings.bottom], [100, layerColors.buildings.top]]
   });
 
   if (map.getSource('lv')) {
@@ -293,7 +318,7 @@ function showPlanLoc(data) {
         'line-cap': 'round'
       },
       'paint': {
-        'line-color': '#4f5283',
+        'line-color': layerColors.lv,
         'line-width': 3
       }
     });
@@ -317,7 +342,7 @@ function showFindNat(data) {
   map.getSource('clusters').setData(data.clusters);
   map.setPaintProperty('clusters', 'fill-color', {
     property: 'score',
-    stops: [[1, '#9ebcda'], [5, '#6e016b']]
+    stops: [[1, layerColors.clustersFind.bottom], [5, layerColors.clustersFind.top]]
   });
 
   $.ajax({
@@ -348,7 +373,7 @@ function prepPlanLoc() {
   map.fitBounds(bbox, {padding: 20});
   map.setPaintProperty('clusters', 'fill-opacity', 0.1);
 
-  $('#map-announce').html('<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>')
+  $('#map-announce').html('<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>');
   $('#btn-zoom-out').click(zoomToNat);
   activeModel = 'plan';
   activeLevel = 'loc';
@@ -366,8 +391,12 @@ function prepPlanLoc() {
     success: updateSliders(planLocParams)
   });
 
-  $('#summary').html(summary['plan-loc']);
-  $('#run-model').html('Run model')
+  let colors = layerColors.buildings;
+  let labels = {'default': 'Un-modelled', 'bottom': 'Small', 'top': 'Large'};
+  legendHtml['plan-loc'] = createLegend(colors, labels);
+
+  $('#summary').html(summaryHtml['plan-loc']);
+  $('#run-model').html('Run model');
 }
 
 /**
@@ -405,7 +434,7 @@ function zoomToNat() {
   //map.setLayoutProperty('clusters', 'visibility', 'visible');
   map.setPaintProperty('clusters', 'fill-opacity', 0.5);
 
-  $('#map-announce').html(clickMsg)
+  $('#map-announce').html(clickMsg);
 
   let config = activeModel == 'plan' ? 'sliders_plan_nat.csv' : 'sliders_find_nat.csv';
   let params = activeModel == 'plan' ? planNatParams : findNatParams;
@@ -417,7 +446,7 @@ function zoomToNat() {
     success: updateSliders(params)
   });
 
-  updateSliders(params);
+  $('#legend').html(legendHtml[summary]);
   $('#summary').html(summaryHtml[summary]);
 }
 
@@ -480,7 +509,23 @@ function updateSummary(summaryData, activeSummary) {
       summary.append('<p>' + label + ': ' + summaryData[name].toFixed(0) + ' ' + unit + '</p>');
     }
     summaryHtml[activeSummary] = summary.html();
+  };
+}
+
+/**
+ * 
+ * @param {*} colors 
+ * @param {*} labels 
+ */
+function createLegend(colors, labels) {
+  let legend = $('#legend');
+  legend.html('');
+  for (var row in colors) {
+    let label = labels[row];
+    let color = colors[row];
+    legend.append('<div><span class="legend-square" style="background-color: ' + color + '"></span><span>' + label + '</span></div>');
   }
+  return legend.html();
 }
 
 /**
@@ -514,6 +559,10 @@ function plan() {
     success: updateSliders(planNatParams)
   });
 
+  let colors = layerColors.clustersPlan;
+  let labels = {'default': 'Un-modelled', 'orig': 'Currently connected', 'new': 'New connections', 'og': 'Off-grid'};
+  legendHtml['plan-nat'] = createLegend(colors, labels);
+
   explore();
 }
 
@@ -532,6 +581,10 @@ function find() {
     success: updateSliders(findNatParams)
   });
 
+  let colors = layerColors.clustersFind;
+  let labels = {'default': 'Un-modelled', 'bottom': 'Low priority', 'top': 'High priority'};
+  legendHtml['find-nat'] = createLegend(colors, labels);
+
   explore();
 }
 
@@ -543,7 +596,7 @@ function home() {
   show('landing');
   hide('explore');
   hide('about');
-  hide('map-announce-outer')
+  hide('map-announce-outer');
 }
 
 /**
@@ -554,7 +607,7 @@ function about() {
   hide('landing');
   hide('explore');
   show('about');
-  hide('map-announce-outer')
+  hide('map-announce-outer');
 }
 
 /**
