@@ -27,9 +27,9 @@ var activeModel;
 // can be one of ['nat', 'loc']
 var activeLevel;
 
-// JSON object containing village data from OSM
-// should prpobably be passed as parameter instead
-var villageData;
+// keep track of the country we're looking at
+// currently only one option
+var country = 'Lesotho';
 
 // current values of input parametres
 // adjdusted by sliders in left sidebar
@@ -38,15 +38,16 @@ var planLocParams = {};
 var planNatParams = {};
 
 // variables for right sidebar summary results
-var planLocSummary = '';
-var planNatSummary = '';
-var findNatSummary = '';
+var summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 
 // message displayed at national-level display
 var clickMsg = 'Click on a cluster to optimise local network';
 
 // keep track of preferred national level zoom
 var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 4};
+
+// keep track of local bounding box
+var bbox;
 
 // Call init() function on DOM load
 $(document).ready(init);
@@ -114,12 +115,29 @@ function addNationalLayers() {
           'fill-color': [
               'match',
               ['get', 'type'],
-              'orig', '#fbb03b',
-              'new', '#223b53',
-              'og', '#e55e5e',
-              /* other */ '#b2e2e2'
+              'orig', '#377eb8', // blue
+              'new', '#4daf4a', // green
+              'og', '#e41a1c', // red
+              '#1d0b1c' // default: grey
             ],
-          'fill-opacity': 0.5
+          'fill-opacity': 0.5,
+        }
+      });
+
+      map.addLayer({
+        'id': 'clusters-outline',
+        'type': 'line',
+        'source': 'clusters',
+        'paint': {
+          'line-color': [
+              'match',
+              ['get', 'type'],
+              'orig', '#377eb8', // blue
+              'new', '#4daf4a', // green
+              'og', '#e41a1c', // red
+              '#1d0b1c' // default: grey
+            ],
+          'line-width': 2,
         }
       });
 
@@ -134,7 +152,7 @@ function addNationalLayers() {
         },
         "paint": {
           "line-color": "black",
-          "line-width": 3
+          "line-width": 2
         }
       });
 
@@ -147,6 +165,8 @@ function addNationalLayers() {
       map.on('mouseleave', 'clusters', function () {
         map.getCanvas().style.cursor = '';
       });
+
+      map.on('click', 'clusters', clusterClick);
     }
   });
 }
@@ -160,14 +180,10 @@ function runModel() {
   $('#loading-bar').modal('show');
   if (activeModel == 'plan' && activeLevel == 'nat') {
     runPlanNat();
-    $('#map-announce').html(clickMsg);
-    show('map-announce-outer')
-  } else if (activeModel == 'plan' && activeLevel = 'loc') {
+  } else if (activeModel == 'plan' && activeLevel == 'loc') {
     runPlanLoc();
   } else if (activeModel == 'find') {
     runFindNat();
-    $('#map-announce').html(clickMsg);
-    show('map-announce-outer');
   }
 }
 
@@ -188,10 +204,19 @@ function runPlanNat() {
  * Run API call for planLoc.
  */
 function runPlanLoc() {
-  $.ajax({
+  var overpassApiUrl = buildOverpassApiUrl('building', bbox);
+  //map.setLayoutProperty('clusters', 'visibility', 'none');
+
+  $.get(overpassApiUrl, function (osmDataAsJson) {
+    let villageData = JSON.stringify(osmtogeojson(osmDataAsJson));
+
+    planLocParams['village'] = villageData;
+
+    $.ajax({
       url: "/run_mgo",
       data: planLocParams,
       success: showPlanLoc
+    });
   });
 }
 
@@ -227,34 +252,18 @@ function showPlanNat(data) {
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "black",
+        "line-color": "#339900",
         "line-width": 3
       }
     });
   }
 
   map.getSource('clusters').setData(data.clusters);
-  map.setPaintProperty('clusters', 'fill-color', [
-    'match',
-    ['get', 'type'],
-    'orig', '#fbb03b',
-    'new', '#223b53',
-    'og', '#e55e5e',
-    '#b2e2e2'
-  ]);
-
-  map.on('click', 'clusters', clusterClick);
 
   $.ajax({
-    url: "/get_slider_config",
+    url: "/get_config",
     data: { config_file: 'summary_plan_nat.csv' },
-    success: updateSummary(planNatParams)
-  });
-
-  $.ajax({
-    url: "/get_slider_config",
-    data: { config_file: 'summary_plan_nat.csv' },
-    success: updateSummary(data.summary, planNatSummary)
+    success: updateSummary(data.summary, 'plan-nat')
   });
 
   $('#loading-bar').modal('hide');
@@ -268,36 +277,47 @@ function showPlanNat(data) {
  * @param {*} data 
  */
 function showPlanLoc(data) {
-  map.addSource('buildings', { type: 'geojson', data: data.buildings });
-  map.addLayer({
-    'id': 'buildings',
-    'type': 'fill',
-    'source': 'buildings',
-    'paint': {
-      'fill-color': '#223b53',
-      'fill-opacity': 0.5
-    }
-  });
+  if (map.getSource("buildings")) {
+    map.getSource('buildings').setData(data.buildings);
+  } else {
+    map.addSource('buildings', { type: 'geojson', data: data.buildings });
+    map.addLayer({
+      'id': 'buildings',
+      'type': 'fill',
+      'source': 'buildings',
+      'paint': {
+        'fill-color': {
+          property: 'area',
+          stops: [[1, '#ccece6'], [5, '#005824']]
+        },
+        'fill-opacity': 0.5
+      }
+    });
+  }
 
-  map.addSource('lv', { type: 'geojson', data: data.network });
-  map.addLayer({
-    'id': 'lv',
-    'type': 'line',
-    'source': 'lv',
-    "layout": {
-      "line-join": "round",
-      "line-cap": "round"
-    },
-    "paint": {
-      "line-color": "black",
-      "line-width": 3
-    }
-  });
+  if (map.getSource("lv")) {
+    map.getSource('lv').setData(data.network);
+  } else {
+    map.addSource('lv', { type: 'geojson', data: data.network });
+    map.addLayer({
+      'id': 'lv',
+      'type': 'line',
+      'source': 'lv',
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "#4f5283",
+        "line-width": 3
+      }
+    });
+  }
 
   $.ajax({
-    url: "/get_slider_config",
+    url: "/get_config",
     data: { config_file: 'summary_plan_loc.csv' },
-    success: updateSummary(data.summary, planLocSummary)
+    success: updateSummary(data.summary, 'plan-loc')
   });
   
   $('#loading-bar').modal('hide');
@@ -313,14 +333,13 @@ function showFindNat(data) {
   map.getSource('clusters').setData(data.clusters);
   map.setPaintProperty('clusters', 'fill-color', {
     property: 'score',
-    stops: [[1, '#b2e2e2'], [5, '#006d2c']]
+    stops: [[1, '#9ebcda'], [5, '#6e016b']]
   });
-  map.on('click', 'clusters', clusterClick);
 
   $.ajax({
-    url: "/get_slider_config",
+    url: "/get_config",
     data: { config_file: 'summary_find_nat.csv' },
-    success: updateSummary(data.summary, findNatSummary)
+    success: updateSummary(data.summary, 'find-nat')
   });
 
   $('#loading-bar').modal('hide');
@@ -335,19 +354,17 @@ function showFindNat(data) {
  */
 function clusterClick(e) {
   var features = map.queryRenderedFeatures(e.point);
-  var bbox = geojsonExtent(features[0].geometry);
-  prepPlanLoc(bbox);
+  bbox = geojsonExtent(features[0].geometry);
+  prepPlanLoc();
 }
 
 
 /**
  * Zoom to clicked cluster and prepare for planLoc.
- * 
- * @param {*} bbox 
  */
-function prepPlanLoc(bbox) {
+function prepPlanLoc() {
   map.fitBounds(bbox, {padding: 20});
-  getOsmData(bbox);
+  map.setPaintProperty('clusters', 'fill-opacity', 0.1);
 
   $('#map-announce').html('<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>')
   $('#btn-zoom-out').click(zoomToNat);
@@ -355,26 +372,13 @@ function prepPlanLoc(bbox) {
   activeLevel = 'loc'
 
   $.ajax({
-    url: "/get_slider_config",
+    url: "/get_config",
     data: { config_file: 'sliders_plan_loc.csv' },
     success: updateSliders(planLocParams)
   });
-  $("#summary").html(planLocSummary);
+
+  $("#summary").html(summary['plan-loc']);
   $('#run-model').html('Run model')
-}
-
-
-/**
- * Get OSM building data from the specified bounding box.
- * 
- * @param {*} bounds 
- */
-function getOsmData(bounds) {
-    var overpassApiUrl = buildOverpassApiUrl('building', bounds);
-
-    $.get(overpassApiUrl, function (osmDataAsJson) {
-        villageData = JSON.stringify(osmtogeojson(osmDataAsJson));
-    });
 }
 
 
@@ -411,20 +415,23 @@ function zoomToNat() {
     zoom: zoomOut.zoom
   });
 
+  //map.setLayoutProperty('clusters', 'visibility', 'visible');
+  map.setPaintProperty('clusters', 'fill-opacity', 0.5);
+
   $('#map-announce').html(clickMsg)
 
   let config = activeModel == 'plan' ? 'sliders_plan_nat.csv' : 'sliders_find_nat.csv';
   let params = activeModel == 'plan' ? planNatParams : findNatParams;
-  let summary = activeModel == 'plan' ? planNatSummary : findNatSummary;
+  let summary = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
 
   $.ajax({
-    url: "/get_slider_config",
+    url: "/get_config",
     data: { config_file: config },
     success: updateSliders(params)
   });
 
   updateSliders(params);
-  $("#summary").html(summary);
+  $("#summary").html(summaryHtml[summary]);
 }
 
 
@@ -468,15 +475,17 @@ function updateSliders(params) {
 }
 
 
+
+
 /**
  * Update summary results in right sidebar.
  * 
  * @param {*} summaryData 
  * @param {*} summaryHtml 
  */
-function updateSummary(summaryData, summaryHtml) {
-  return function(config) {
-    let val = summaryData;
+function updateSummary(summaryData, activeSummary) {
+  return function(data) {
+    let config = data.config;
     let summary = $("#summary");
 
     summary.html('');
@@ -485,10 +494,9 @@ function updateSummary(summaryData, summaryHtml) {
       let name = vals.name;
       let label = vals.label;
       let unit = vals.unit;
-
       summary.append('<p>' + label + ': ' + summaryData[name].toFixed(0) + ' ' + unit + '</p>');
     }
-    summaryHtml = summary.html();
+    summaryHtml[activeSummary] = summary.html();
   }
 }
 
@@ -500,6 +508,10 @@ function explore() {
   hide("landing");
   show("explore");
   hide("about");
+
+  $('#map-announce').html(clickMsg);
+  show('map-announce-outer')
+
   map.resize();
 }
 
@@ -516,7 +528,7 @@ function plan() {
   $('#run-model').html('Run model')
 
   $.ajax({
-    url: "/get_slider_config",
+    url: "/get_config",
     data: { config_file: 'sliders_plan_nat.csv' },
     success: updateSliders(planNatParams)
   });
@@ -535,7 +547,7 @@ function find() {
   $('#run-model').html('Filter');
 
   $.ajax({
-    url: "/get_slider_config",
+    url: "/get_config",
     data: { config_file: 'sliders_find_nat.csv' },
     success: updateSliders(findNatParams)
   });
