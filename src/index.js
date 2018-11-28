@@ -43,6 +43,7 @@ var legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 
 // message displayed at national-level display
 var clickMsg = 'Click on a cluster to optimise local network';
+var clickBtn;
 
 // keep track of preferred national level zoom
 var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
@@ -373,16 +374,29 @@ function prepPlanLoc() {
   map.fitBounds(bbox, {padding: 20});
   map.setPaintProperty('clusters', 'fill-opacity', 0.1);
 
-  $('#map-announce').html('<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>');
+  clickBtn = '<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>'
+  $('#map-announce').html(clickBtn);
   $('#btn-zoom-out').click(zoomToNat);
   activeModel = 'plan';
   activeLevel = 'loc';
 
   let overpassApiUrl = buildOverpassApiUrl('building', bbox);
   $.get(overpassApiUrl, function (osmDataAsJson) {
-    let villageData = osmtogeojson(osmDataAsJson);
-    map.getSource('buildings').setData(villageData);
-    planLocParams['village'] = JSON.stringify(villageData);
+    let numBuildings = osmDataAsJson.elements.length;
+
+    if (numBuildings > 2000) {
+      // will cause slow behaviour or too-long model run
+      $('#map-announce').html('Choose a smaller village!');
+      setTimeout(resetAnnounce, 2000);
+    } else if (numBuildings < 5) {
+      // not enough data to work with
+      $('#map-announce').html('Choose a village with more buildings!');
+      setTimeout(resetAnnounce, 2000);
+    } else {
+      let villageData = osmtogeojson(osmDataAsJson);
+      map.getSource('buildings').setData(villageData);
+      planLocParams['village'] = JSON.stringify(villageData);
+    }
   });
 
   $.ajax({
@@ -608,6 +622,14 @@ function about() {
   hide('explore');
   show('about');
   hide('map-announce-outer');
+}
+
+/**
+ * Reset announce box after a warning message.
+ */
+function resetAnnounce() {
+  $('#map-announce').html(clickBtn);
+  $('#btn-zoom-out').click(zoomToNat);
 }
 
 /**
