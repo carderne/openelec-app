@@ -29,7 +29,7 @@ var activeLevel;
 
 // keep track of the country we're looking at
 // currently only one option
-var country = 'Lesotho';
+var currentCountry = 'Lesotho';
 
 // current values of input parametres
 // adjdusted by sliders in left sidebar
@@ -44,10 +44,12 @@ var summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 var clickMsg = 'Click on a cluster to optimise local network';
 
 // keep track of preferred national level zoom
-var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 4};
+var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
 
 // keep track of local bounding box
 var bbox;
+
+var emptyGeoJSON = { "type": "FeatureCollection", "features": [] }
 
 // Call init() function on DOM load
 $(document).ready(init);
@@ -59,7 +61,7 @@ $(document).ready(init);
  */
 function init() {
   createMap();
-  addNationalLayers();
+  addMapLayers();
 
   $('#go-home').click(home);
   $('#go-about').click(about);
@@ -94,9 +96,10 @@ function createMap() {
 /**
  * Add national layers (grid and clusters) for the country.
  */activeModel
-function addNationalLayers() {
+function addMapLayers() {
   $.ajax({
     url: "/get_country",
+    data: { 'country': currentCountry },
     success: function(data) {
       zoomOut.lng = data.lng;
       zoomOut.lat = data.lat;
@@ -123,7 +126,6 @@ function addNationalLayers() {
           'fill-opacity': 0.5,
         }
       });
-
       map.addLayer({
         'id': 'clusters-outline',
         'type': 'line',
@@ -153,6 +155,17 @@ function addNationalLayers() {
         "paint": {
           "line-color": "black",
           "line-width": 2
+        }
+      });
+
+      map.addSource('buildings', { type: 'geojson', data: emptyGeoJSON });
+      map.addLayer({
+        'id': 'buildings',
+        'type': 'fill',
+        'source': 'buildings',
+        'paint': {
+          'fill-color': '#005824',
+          'fill-opacity': 0.8
         }
       });
 
@@ -192,6 +205,7 @@ function runModel() {
  * Run API call for planNat.
  */
 function runPlanNat() {
+  planNatParams['country'] = currentCountry;
   $.ajax({
       url: "/run_electrify",
       data: planNatParams,
@@ -204,13 +218,9 @@ function runPlanNat() {
  * Run API call for planLoc.
  */
 function runPlanLoc() {
-  var overpassApiUrl = buildOverpassApiUrl('building', bbox);
-  //map.setLayoutProperty('clusters', 'visibility', 'none');
-
+  let overpassApiUrl = buildOverpassApiUrl('building', bbox);
   $.get(overpassApiUrl, function (osmDataAsJson) {
-    let villageData = JSON.stringify(osmtogeojson(osmDataAsJson));
-
-    planLocParams['village'] = villageData;
+    planLocParams['village'] = JSON.stringify(osmtogeojson(osmDataAsJson));
 
     $.ajax({
       url: "/run_mgo",
@@ -225,6 +235,7 @@ function runPlanLoc() {
  * Run API call for findNat.
  */
 function runFindNat() {
+  findNatParams['country'] = currentCountry;
   $.ajax({
     url: "/find_clusters",
     data: findNatParams,
@@ -277,23 +288,11 @@ function showPlanNat(data) {
  * @param {*} data 
  */
 function showPlanLoc(data) {
-  if (map.getSource("buildings")) {
-    map.getSource('buildings').setData(data.buildings);
-  } else {
-    map.addSource('buildings', { type: 'geojson', data: data.buildings });
-    map.addLayer({
-      'id': 'buildings',
-      'type': 'fill',
-      'source': 'buildings',
-      'paint': {
-        'fill-color': {
-          property: 'area',
-          stops: [[1, '#ccece6'], [5, '#005824']]
-        },
-        'fill-opacity': 0.5
-      }
-    });
-  }
+  map.getSource('buildings').setData(data.buildings);
+  map.setPaintProperty('buildings', 'fill-color', {
+    property: 'area',
+    stops: [[1, '#ccece6'], [100, '#005824']]
+  });
 
   if (map.getSource("lv")) {
     map.getSource('lv').setData(data.network);
@@ -370,6 +369,13 @@ function prepPlanLoc() {
   $('#btn-zoom-out').click(zoomToNat);
   activeModel = 'plan';
   activeLevel = 'loc'
+
+  let overpassApiUrl = buildOverpassApiUrl('building', bbox);
+  $.get(overpassApiUrl, function (osmDataAsJson) {
+    let villageData = osmtogeojson(osmDataAsJson);
+    map.getSource('buildings').setData(villageData);
+    planLocParams['village'] = JSON.stringify(villageData);
+  });
 
   $.ajax({
     url: "/get_config",
