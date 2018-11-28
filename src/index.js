@@ -13,8 +13,8 @@ import osmtogeojson from 'osmtogeojson';
 import 'bootstrap/js/dist/modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import 'bootstrap-slider'
-import 'bootstrap-slider/dist/css/bootstrap-slider.min.css'
+import 'bootstrap-slider';
+import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 
 import './style.css';
 
@@ -49,11 +49,10 @@ var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
 // keep track of local bounding box
 var bbox;
 
-var emptyGeoJSON = { "type": "FeatureCollection", "features": [] }
+var emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
 
 // Call init() function on DOM load
 $(document).ready(init);
-
 
 /**
  * Called on DOM load.
@@ -77,28 +76,26 @@ function init() {
   });
 }
 
-
 /**
  * Create the Mapbox GL map.
  */
 function createMap() {
   mapboxgl.accessToken = 'pk.eyJ1IjoiY2FyZGVybmUiLCJhIjoiY2puZnE3YXkxMDBrZTNrczI3cXN2OXQzNiJ9.2BDgu40zHwh3CAfHs6reAQ';
   map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v9',
-      center: [zoomOut.lng, zoomOut.lat],
-      zoom: zoomOut.zoom
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v9',
+    center: [zoomOut.lng, zoomOut.lat],
+    zoom: zoomOut.zoom
   });
   map.addControl(new mapboxgl.NavigationControl());
 }
 
-
 /**
  * Add national layers (grid and clusters) for the country.
- */activeModel
+ */
 function addMapLayers() {
   $.ajax({
-    url: "/get_country",
+    url: '/get_country',
     data: { 'country': currentCountry },
     success: function(data) {
       zoomOut.lng = data.lng;
@@ -116,13 +113,13 @@ function addMapLayers() {
         'source': 'clusters',
         'paint': {
           'fill-color': [
-              'match',
-              ['get', 'type'],
-              'orig', '#377eb8', // blue
-              'new', '#4daf4a', // green
-              'og', '#e41a1c', // red
-              '#1d0b1c' // default: grey
-            ],
+            'match',
+            ['get', 'type'],
+            'orig', '#377eb8', // blue
+            'new', '#4daf4a', // green
+            'og', '#e41a1c', // red
+            '#1d0b1c' // default: grey
+          ],
           'fill-opacity': 0.5,
         }
       });
@@ -132,13 +129,13 @@ function addMapLayers() {
         'source': 'clusters',
         'paint': {
           'line-color': [
-              'match',
-              ['get', 'type'],
-              'orig', '#377eb8', // blue
-              'new', '#4daf4a', // green
-              'og', '#e41a1c', // red
-              '#1d0b1c' // default: grey
-            ],
+            'match',
+            ['get', 'type'],
+            'orig', '#377eb8', // blue
+            'new', '#4daf4a', // green
+            'og', '#e41a1c', // red
+            '#1d0b1c' // default: grey
+          ],
           'line-width': 2,
         }
       });
@@ -148,13 +145,13 @@ function addMapLayers() {
         'id': 'grid',
         'type': 'line',
         'source': 'grid',
-        "layout": {
-          "line-join": "round",
-          "line-cap": "round"
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
         },
-        "paint": {
-          "line-color": "black",
-          "line-width": 2
+        'paint': {
+          'line-color': 'black',
+          'line-width': 2
         }
       });
 
@@ -184,7 +181,6 @@ function addMapLayers() {
   });
 }
 
-
 /**
  * Called by the id=run-model button.
  * Calls a function depending on which model is currently active.
@@ -200,36 +196,28 @@ function runModel() {
   }
 }
 
-
 /**
  * Run API call for planNat.
  */
 function runPlanNat() {
   planNatParams['country'] = currentCountry;
   $.ajax({
-      url: "/run_electrify",
-      data: planNatParams,
-      success: showPlanNat
-  });
+    url: '/run_electrify',
+    data: planNatParams,
+    success: showPlanNat
+  })
 }
-
 
 /**
  * Run API call for planLoc.
  */
 function runPlanLoc() {
-  let overpassApiUrl = buildOverpassApiUrl('building', bbox);
-  $.get(overpassApiUrl, function (osmDataAsJson) {
-    planLocParams['village'] = JSON.stringify(osmtogeojson(osmDataAsJson));
-
-    $.ajax({
-      url: "/run_mgo",
-      data: planLocParams,
-      success: showPlanLoc
-    });
+  $.ajax({
+    url: '/run_mgo',
+    data: planLocParams,
+    success: showPlanLoc
   });
 }
-
 
 /**
  * Run API call for findNat.
@@ -237,12 +225,11 @@ function runPlanLoc() {
 function runFindNat() {
   findNatParams['country'] = currentCountry;
   $.ajax({
-    url: "/find_clusters",
+    url: '/find_clusters',
     data: findNatParams,
     success: showFindNat
   });
 }
-
 
 /**
  * Update map and summary pane with results from model.
@@ -250,7 +237,7 @@ function runFindNat() {
  * @param {*} data 
  */
 function showPlanNat(data) {
-  if (map.getSource("network")) {
+  if (map.getSource('network')) {
     map.getSource('network').setData(data.network);
   } else {
     map.addSource('network', { type: 'geojson', data: data.network });
@@ -258,13 +245,13 @@ function showPlanNat(data) {
       'id': 'network',
       'type': 'line',
       'source': 'network',
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
       },
-      "paint": {
-        "line-color": "#339900",
-        "line-width": 3
+      'paint': {
+        'line-color': '#339900',
+        'line-width': 3
       }
     });
   }
@@ -272,14 +259,13 @@ function showPlanNat(data) {
   map.getSource('clusters').setData(data.clusters);
 
   $.ajax({
-    url: "/get_config",
+    url: '/get_config',
     data: { config_file: 'summary_plan_nat.csv' },
     success: updateSummary(data.summary, 'plan-nat')
   });
 
   $('#loading-bar').modal('hide');
 }
-
 
 /**
  * After model run, display summary results and
@@ -294,7 +280,7 @@ function showPlanLoc(data) {
     stops: [[1, '#ccece6'], [100, '#005824']]
   });
 
-  if (map.getSource("lv")) {
+  if (map.getSource('lv')) {
     map.getSource('lv').setData(data.network);
   } else {
     map.addSource('lv', { type: 'geojson', data: data.network });
@@ -302,26 +288,25 @@ function showPlanLoc(data) {
       'id': 'lv',
       'type': 'line',
       'source': 'lv',
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
       },
-      "paint": {
-        "line-color": "#4f5283",
-        "line-width": 3
+      'paint': {
+        'line-color': '#4f5283',
+        'line-width': 3
       }
     });
   }
 
   $.ajax({
-    url: "/get_config",
+    url: '/get_config',
     data: { config_file: 'summary_plan_loc.csv' },
     success: updateSummary(data.summary, 'plan-loc')
   });
   
   $('#loading-bar').modal('hide');
 }
-
 
 /**
  * Update map and summary pane with model results.
@@ -336,14 +321,13 @@ function showFindNat(data) {
   });
 
   $.ajax({
-    url: "/get_config",
+    url: '/get_config',
     data: { config_file: 'summary_find_nat.csv' },
     success: updateSummary(data.summary, 'find-nat')
   });
 
   $('#loading-bar').modal('hide');
 }
-
 
 /**
  * Get the bounding box from the clicked cluster,
@@ -357,7 +341,6 @@ function clusterClick(e) {
   prepPlanLoc();
 }
 
-
 /**
  * Zoom to clicked cluster and prepare for planLoc.
  */
@@ -368,7 +351,7 @@ function prepPlanLoc() {
   $('#map-announce').html('<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>')
   $('#btn-zoom-out').click(zoomToNat);
   activeModel = 'plan';
-  activeLevel = 'loc'
+  activeLevel = 'loc';
 
   let overpassApiUrl = buildOverpassApiUrl('building', bbox);
   $.get(overpassApiUrl, function (osmDataAsJson) {
@@ -378,15 +361,14 @@ function prepPlanLoc() {
   });
 
   $.ajax({
-    url: "/get_config",
+    url: '/get_config',
     data: { config_file: 'sliders_plan_loc.csv' },
     success: updateSliders(planLocParams)
   });
 
-  $("#summary").html(summary['plan-loc']);
+  $('#summary').html(summary['plan-loc']);
   $('#run-model').html('Run model')
 }
-
 
 /**
  * Build on OSM overpass query based on the bounds and query.
@@ -394,22 +376,21 @@ function prepPlanLoc() {
  * @param {*} overpassQuery 
  * @param {*} bounds 
  */
-function buildOverpassApiUrl(overpassQuery, bounds) {
-    var west = bounds[0];
-    var south = bounds[1];
-    var east = bounds[2];
-    var north = bounds[3];
+function buildOverpassApiUrl(overpassQuery, bbox) {
+  var west = bbox[0];
+  var south = bbox[1];
+  var east = bbox[2];
+  var north = bbox[3];
 
-    var bounds = south + ', ' + west + ', ' + north + ', ' + east;
-    var nodeQuery = 'node[' + overpassQuery + '](' + bounds + ');';
-    var wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
-    var relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
-    var query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
-    var baseUrl = 'http://overpass-api.de/api/interpreter';
-    var resultUrl = baseUrl + query;
-    return resultUrl;
+  var bounds = south + ', ' + west + ', ' + north + ', ' + east;
+  var nodeQuery = 'node[' + overpassQuery + '](' + bounds + ');';
+  var wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
+  var relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
+  var query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
+  var baseUrl = 'http://overpass-api.de/api/interpreter';
+  var resultUrl = baseUrl + query;
+  return resultUrl;
 }
-
 
 /**
  * Zoom out from local to national level,
@@ -431,15 +412,14 @@ function zoomToNat() {
   let summary = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
 
   $.ajax({
-    url: "/get_config",
+    url: '/get_config',
     data: { config_file: config },
     success: updateSliders(params)
   });
 
   updateSliders(params);
-  $("#summary").html(summaryHtml[summary]);
+  $('#summary').html(summaryHtml[summary]);
 }
-
 
 /**
  * Update the left sidebar parametre sliders depnding on the passed params.
@@ -449,7 +429,7 @@ function zoomToNat() {
 function updateSliders(params) {
   return function(data) {
     let slider_vals = data.config;
-    let sliders = $("#sliders");
+    let sliders = $('#sliders');
 
     sliders.html('');
     for (var row in slider_vals) {
@@ -472,16 +452,13 @@ function updateSliders(params) {
       sliders.append('<input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + params[name] + '"/>');
 
       $('#' + sliderId).slider();
-      $('#' + sliderId).on("slide", function(slideEvt) {
+      $('#' + sliderId).on('slide', function(slideEvt) {
         $('#' + sliderValId).text(slideEvt.value);
         params[name] = parseFloat($('#' + sliderId).val());
       });
     }
-  }
+  };
 }
-
-
-
 
 /**
  * Update summary results in right sidebar.
@@ -492,7 +469,7 @@ function updateSliders(params) {
 function updateSummary(summaryData, activeSummary) {
   return function(data) {
     let config = data.config;
-    let summary = $("#summary");
+    let summary = $('#summary');
 
     summary.html('');
     for (var row in config) {
@@ -506,21 +483,19 @@ function updateSummary(summaryData, activeSummary) {
   }
 }
 
-
 /**
  * Display the main explore screen with map centered.
  */
 function explore() {
-  hide("landing");
-  show("explore");
-  hide("about");
+  hide('landing');
+  show('explore');
+  hide('about');
 
   $('#map-announce').html(clickMsg);
-  show('map-announce-outer')
+  show('map-announce-outer');
 
   map.resize();
 }
-
 
 /**
  * Called by clicking the 'plan' button.
@@ -529,12 +504,12 @@ function plan() {
   // pushState doesn't work from static file, test with Flask
   //window.history.pushState({}, 'OpenElec | Plan', 'openelec.com/plan');
   activeModel = 'plan';
-  activeLevel = 'nat'
-  activeMode("go-plan");
-  $('#run-model').html('Run model')
+  activeLevel = 'nat';
+  activeMode('go-plan');
+  $('#run-model').html('Run model');
 
   $.ajax({
-    url: "/get_config",
+    url: '/get_config',
     data: { config_file: 'sliders_plan_nat.csv' },
     success: updateSliders(planNatParams)
   });
@@ -542,18 +517,17 @@ function plan() {
   explore();
 }
 
-
 /**
  * Called by the find opportunities button.
  */
 function find() {
   activeModel = 'find';
   activeLevel = 'nat';
-  activeMode("go-find");
+  activeMode('go-find');
   $('#run-model').html('Filter');
 
   $.ajax({
-    url: "/get_config",
+    url: '/get_config',
     data: { config_file: 'sliders_find_nat.csv' },
     success: updateSliders(findNatParams)
   });
@@ -561,30 +535,27 @@ function find() {
   explore();
 }
 
-
 /**
  * Display the home page.
  */
 function home() {
   activeMode();
-  show("landing");
-  hide("explore");
-  hide("about");
+  show('landing');
+  hide('explore');
+  hide('about');
   hide('map-announce-outer')
 }
-
 
 /**
  * Display the about page.
  */
 function about() {
   activeMode();
-  hide("landing");
-  hide("explore");
-  show("about");
+  hide('landing');
+  hide('explore');
+  show('about');
   hide('map-announce-outer')
 }
-
 
 /**
  * Enable/disable buttons depending on mode.
@@ -592,13 +563,12 @@ function about() {
  * @param {*} mode 
  */
 function activeMode(mode) {
-  disableClass("go-plan", "btn-primary");
-  disableClass("go-find", "btn-primary");
+  disableClass('go-plan', 'btn-primary');
+  disableClass('go-find', 'btn-primary');
   if (mode) {
-    enableClass(mode, "btn-primary");
+    enableClass(mode, 'btn-primary');
   }
 }
-
 
 /**
  * Hide an element by enabling the 'hidden' class.
@@ -606,7 +576,7 @@ function activeMode(mode) {
  * @param {*} elementId 
  */
 function hide(elementId) {
-  enableClass(elementId, "hidden");
+  enableClass(elementId, 'hidden');
 }
 
 
@@ -616,9 +586,8 @@ function hide(elementId) {
  * @param {*} elementId 
  */
 function show(elementId) {
-  disableClass(elementId, "hidden");
+  disableClass(elementId, 'hidden');
 }
-
 
 /**
  * Enable the given class on the given element.
@@ -627,9 +596,9 @@ function show(elementId) {
  * @param {*} className 
  */
 function enableClass(elementId, className) {
-  var element = document.getElementById(elementId)
+  var element = document.getElementById(elementId);
   if (!element.classList.contains(className)) {
-    element.classList.add(className)
+    element.classList.add(className);
   }
 }
 
