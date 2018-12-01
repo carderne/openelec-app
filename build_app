@@ -2,8 +2,10 @@
 
 npm run dev
 
+rm ../openelec_app/openelec_app/templates/*
 cp dist/index.html ../openelec_app/openelec_app/templates/
 echo "Copied index.html to ../openelec_app/openelec_app/templates/"
 
-cp dist/main.js ../openelec_app/openelec_app/static/
-echo "Copied main.js to ../openelec_app/openelec_app/static/"
+rm ../openelec_app/openelec_app/static/*
+cp dist/static/*.js ../openelec_app/openelec_app/static/
+echo "Copied JS to ../openelec_app/openelec_app/static/"
