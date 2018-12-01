@@ -33,17 +33,17 @@ var currentCountry = 'Lesotho';
 
 // current values of input parametres
 // adjdusted by sliders in left sidebar
-var findNatParams = {};
-var planLocParams = {};
-var planNatParams = {};
+var sliderConfigs = {}; // = {'plan-nat': {}, 'plan-loc': {}, 'find-nat': {}};
+var sliderParams = {}; //{'plan-nat': {}, 'plan-loc': {}, 'find-nat': {}};
 
 // variables for right sidebar legend and summary results
+var summaryConfigs = {};
 var summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 var legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 
 // message displayed at national-level display
 var clickMsg = 'Click on a cluster to optimise local network';
-var clickBtn;
+var clickBtn = '<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>';
 
 // keep track of preferred national level zoom
 var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
@@ -226,10 +226,10 @@ function runModel() {
  * Run API call for planNat.
  */
 function runPlanNat() {
-  planNatParams['country'] = currentCountry;
+  sliderParams['plan-nat']['country'] = currentCountry;
   $.ajax({
     url: '/run_electrify',
-    data: planNatParams,
+    data: sliderParams['plan-nat'],
     success: showPlanNat
   });
 }
@@ -240,7 +240,7 @@ function runPlanNat() {
 function runPlanLoc() {
   $.ajax({
     url: '/run_mgo',
-    data: planLocParams,
+    data: sliderParams['plan-loc'],
     success: showPlanLoc
   });
 }
@@ -249,10 +249,10 @@ function runPlanLoc() {
  * Run API call for findNat.
  */
 function runFindNat() {
-  findNatParams['country'] = currentCountry;
+  sliderParams['find-nat']['country'] = currentCountry;
   $.ajax({
     url: '/find_clusters',
-    data: findNatParams,
+    data: sliderParams['find-nat'],
     success: showFindNat
   });
 }
@@ -284,12 +284,7 @@ function showPlanNat(data) {
 
   map.getSource('clusters').setData(data.clusters);
 
-  $.ajax({
-    url: '/get_config',
-    data: { config_file: 'summary_plan_nat.csv' },
-    success: updateSummary(data.summary, 'plan-nat')
-  });
-
+  loadSummaryConfig('plan-nat', data.summary);
   $('#loading-bar').modal('hide');
 }
 
@@ -325,12 +320,7 @@ function showPlanLoc(data) {
     });
   }
 
-  $.ajax({
-    url: '/get_config',
-    data: { config_file: 'summary_plan_loc.csv' },
-    success: updateSummary(data.summary, 'plan-loc')
-  });
-  
+  loadSummaryConfig('plan-loc', data.summary); 
   $('#loading-bar').modal('hide');
 }
 
@@ -346,11 +336,7 @@ function showFindNat(data) {
     stops: [[1, layerColors.clustersFind.bottom], [5, layerColors.clustersFind.top]]
   });
 
-  $.ajax({
-    url: '/get_config',
-    data: { config_file: 'summary_find_nat.csv' },
-    success: updateSummary(data.summary, 'find-nat')
-  });
+  loadSummaryConfig('find-nat', data.summary);
 
   $('#loading-bar').modal('hide');
 }
@@ -374,7 +360,6 @@ function prepPlanLoc() {
   map.fitBounds(bbox, {padding: 20});
   map.setPaintProperty('clusters', 'fill-opacity', 0.1);
 
-  clickBtn = '<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>'
   $('#map-announce').html(clickBtn);
   $('#btn-zoom-out').click(zoomToNat);
   activeModel = 'plan';
@@ -395,15 +380,11 @@ function prepPlanLoc() {
     } else {
       let villageData = osmtogeojson(osmDataAsJson);
       map.getSource('buildings').setData(villageData);
-      planLocParams['village'] = JSON.stringify(villageData);
+      sliderParams['plan-loc']['village'] = JSON.stringify(villageData);
     }
   });
 
-  $.ajax({
-    url: '/get_config',
-    data: { config_file: 'sliders_plan_loc.csv' },
-    success: updateSliders(planLocParams)
-  });
+  loadSliderConfig('plan-loc');
 
   let colors = layerColors.buildings;
   let labels = {'default': 'Un-modelled', 'bottom': 'Small', 'top': 'Large'};
@@ -445,62 +426,128 @@ function zoomToNat() {
     zoom: zoomOut.zoom
   });
 
-  //map.setLayoutProperty('clusters', 'visibility', 'visible');
   map.setPaintProperty('clusters', 'fill-opacity', 0.5);
 
   $('#map-announce').html(clickMsg);
 
-  let config = activeModel == 'plan' ? 'sliders_plan_nat.csv' : 'sliders_find_nat.csv';
-  let params = activeModel == 'plan' ? planNatParams : findNatParams;
-  let summary = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
+  let state = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
 
-  $.ajax({
-    url: '/get_config',
-    data: { config_file: config },
-    success: updateSliders(params)
-  });
-
-  $('#legend').html(legendHtml[summary]);
-  $('#summary').html(summaryHtml[summary]);
+  updateSliders(state);
+  $('#legend').html(legendHtml[state]);
+  $('#summary').html(summaryHtml[state]);
 }
+
+/**
+ * Get appropriate slider config file for given state.
+ * @param {*} state 
+ */
+function sliderConfigName(state) {
+  switch (state) {
+    case 'plan-nat': return 'sliders_plan_nat.csv';
+    case 'plan-loc': return 'sliders_plan_loc.csv';
+    case 'find-nat': return 'sliders_find_nat.csv';
+  }
+}
+
+/**
+ * Get slider config from file if not loaded before.
+ * @param {*} state 
+ */
+function loadSliderConfig(state) {
+  if (!sliderConfigs[state]) {
+    sliderConfigs[state] = {};
+    sliderParams[state] = {};
+    $.ajax({
+      url: '/get_config',
+      data: { config_file: sliderConfigName(state) },
+      success: updateSlidersClosure(state)
+    });
+  } else {
+    updateSliders(state);
+  }
+}
+
+/**
+ * Wrap updateSliders for AJAX callback.
+ * @param {*} state 
+ */
+function updateSlidersClosure(state) {
+  return function(data) {
+    updateSliders(state, data.config);
+  };
+}
+
+
 
 /**
  * Update the left sidebar parametre sliders depnding on the passed params.
  * 
  * @param {*} params 
  */
-function updateSliders(params) {
-  return function(data) {
-    let slider_vals = data.config;
-    let sliders = $('#sliders');
+function updateSliders(state, config) {
+  if (config) {
+    sliderConfigs[state] = config;
+  }
+  
+  let slider_vals = sliderConfigs[state];
+  let sliders = $('#sliders');
 
-    sliders.html('');
-    for (var row in slider_vals) {
-      let vals = slider_vals[row];
-      let name = vals.name;
-      let label = vals.label;
-      let unit = vals.unit;
-      let min = parseFloat(vals.min);
-      let max = parseFloat(vals.max);
-      let step = parseFloat(vals.step);
-      let def = parseFloat(vals.default);
+  sliders.html('');
+  for (var row in slider_vals) {
+    let vals = slider_vals[row];
+    let name = vals.name;
+    let label = vals.label;
+    let unit = vals.unit;
+    let min = parseFloat(vals.min);
+    let max = parseFloat(vals.max);
+    let step = parseFloat(vals.step);
+    let def = parseFloat(vals.default);
 
-      let sliderId = 'sl-' + name;
-      let sliderValId = 'sl-' + name + '-val';
-      if (!params[name]) {
-        params[name] = def;
-      }
-
-      sliders.append('<br><span>' + label + ': <span id="' + sliderValId + '">' + params[name] + '</span> ' + unit + '</span');
-      sliders.append('<input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + params[name] + '"/>');
-
-      $('#' + sliderId).slider();
-      $('#' + sliderId).on('slide', function(slideEvt) {
-        $('#' + sliderValId).text(slideEvt.value);
-        params[name] = parseFloat($('#' + sliderId).val());
-      });
+    let sliderId = 'sl-' + name;
+    let sliderValId = 'sl-' + name + '-val';
+    if (!sliderParams[state][name]) {
+      sliderParams[state][name] = def;
     }
-  };
+
+    sliders.append('<br><span>' + label + ': <span id="' + sliderValId + '">' + sliderParams[state][name] + '</span> ' + unit + '</span');
+    sliders.append('<input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + sliderParams[state][name] + '"/>');
+
+    $('#' + sliderId).slider();
+    $('#' + sliderId).on('slide', function(slideEvt) {
+      $('#' + sliderValId).text(slideEvt.value);
+      sliderParams[state][name] = parseFloat($('#' + sliderId).val());
+    });
+  }
+}
+
+/**
+ * Get the conrrect summary config file given a state.
+ * @param {*} state 
+ */
+function summaryConfigName(state) {
+  switch (state) {
+    case 'plan-nat': return 'summary_plan_nat.csv';
+    case 'plan-loc': return 'summary_plan_loc.csv';
+    case 'find-nat': return 'summary_find_nat.csv';
+  }
+}
+
+/**
+ * Loads summary config from file if it hasn't been loaded before.
+ * @param {*} state 
+ * @param {*} summary 
+ */
+function loadSummaryConfig(state, summary) {
+  if (!summaryConfigs[state]) {
+    summaryConfigs[state] = {};
+    $.ajax({
+      url: '/get_config',
+      data: { config_file: summaryConfigName(state) },
+      success: updateSummary(state, summary)
+    });
+  } else {
+    updateSummary(state, summary);
+  }
 }
 
 /**
@@ -509,7 +556,7 @@ function updateSliders(params) {
  * @param {*} summaryData 
  * @param {*} summaryHtml 
  */
-function updateSummary(summaryData, activeSummary) {
+function updateSummary(state, summaryData) {
   return function(data) {
     let config = data.config;
     let summary = $('#summary');
@@ -522,7 +569,7 @@ function updateSummary(summaryData, activeSummary) {
       let unit = vals.unit;
       summary.append('<p>' + label + ': ' + summaryData[name].toFixed(0) + ' ' + unit + '</p>');
     }
-    summaryHtml[activeSummary] = summary.html();
+    summaryHtml[state] = summary.html();
   };
 }
 
@@ -567,11 +614,12 @@ function plan() {
   activeMode('go-plan');
   $('#run-model').html('Run model');
 
-  $.ajax({
-    url: '/get_config',
-    data: { config_file: 'sliders_plan_nat.csv' },
-    success: updateSliders(planNatParams)
-  });
+  loadSliderConfig('plan-nat');
+
+  $('#summary').html(summaryHtml['plan-nat']);
+  if (map.getLayer('network')) {
+    map.setLayoutProperty('network', 'visibility', 'visible');
+  }
 
   let colors = layerColors.clustersPlan;
   let labels = {'default': 'Un-modelled', 'orig': 'Currently connected', 'new': 'New connections', 'og': 'Off-grid'};
@@ -589,11 +637,12 @@ function find() {
   activeMode('go-find');
   $('#run-model').html('Filter');
 
-  $.ajax({
-    url: '/get_config',
-    data: { config_file: 'sliders_find_nat.csv' },
-    success: updateSliders(findNatParams)
-  });
+  loadSliderConfig('find-nat');
+
+  $('#summary').html(summaryHtml['find-nat']);
+  if (map.getLayer('network')) {
+    map.setLayoutProperty('network', 'visibility', 'none');
+  }
 
   let colors = layerColors.clustersFind;
   let labels = {'default': 'Un-modelled', 'bottom': 'Low priority', 'top': 'High priority'};
