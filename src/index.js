@@ -571,6 +571,9 @@ function find() {
   }
 }
 
+/**
+ * 
+ */
 function explore() {
   country = this.id;
   $.ajax({
@@ -649,7 +652,6 @@ function hide(elementId) {
   enableClass(elementId, 'hidden');
 }
 
-
 /**
  * Show a class by removing the 'hidden' class.
  * 
@@ -672,7 +674,6 @@ function enableClass(elementId, className) {
   }
 }
 
-
 /**
  * Disable the given class on the given element.
  * 
@@ -686,12 +687,20 @@ function disableClass(elementId, className) {
   }
 }
 
+/**
+ * 
+ * @param {*} r 
+ */
 function importImages(r) {
   let images = {};
   r.keys().map((item) => { images[item.replace('./', '')] = r(item); });
   return images;
 }
 
+/**
+ * 
+ * @param {*} string 
+ */
 function capFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
