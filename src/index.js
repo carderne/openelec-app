@@ -19,41 +19,44 @@ import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 import './style.css';
 import { sliderConfigs, summaryConfigs } from './config.js';
 
+// API url
+const API = 'http://127.0.0.1:5000/';
+
 // object for Mapbox GL map
-var map;
+let map;
 
 // can be one of ['plan', 'find'] 
-var activeModel;
+let activeModel;
 
 // can be one of ['nat', 'loc']
-var activeLevel;
+let activeLevel;
 
 // keep track of the country we're looking at
 // currently only one option
-var currentCountry = 'Lesotho';
+let currentCountry = 'Lesotho';
 
 // current values of input parametres
-var sliderParams = {};
+const sliderParams = {};
 
 // variables for right sidebar legend and summary results
-var summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
-var legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
+const summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
+const legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 
 // message displayed at national-level display
-var clickMsg = 'Click on a cluster to optimise local network';
-var clickBtn = '<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>';
+const clickMsg = 'Click on a cluster to optimise local network';
+const clickBtn = '<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>';
 
 // keep track of preferred national level zoom
-var zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
+const zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
 
 // keep track of local bounding box
-var bbox;
+let bbox;
 
 // to intialise buildings layer before we have the GeoJSON
-var emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
+const emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
 
 // 
-var layerColors = {
+const layerColors = {
   'grid': '#474747', // grey
   'clustersPlan': {
     'default': '#1d0b1c', //grey
@@ -119,7 +122,7 @@ function createMap() {
  */
 function addMapLayers() {
   $.ajax({
-    url: '/get_country',
+    url: API + 'get_country',
     data: { 'country': currentCountry },
     success: function(data) {
       zoomOut.lng = data.lng;
@@ -226,7 +229,7 @@ function runModel() {
 function runPlanNat() {
   sliderParams['plan-nat']['country'] = currentCountry;
   $.ajax({
-    url: '/run_electrify',
+    url: API + 'run_electrify',
     data: sliderParams['plan-nat'],
     success: showPlanNat
   });
@@ -237,7 +240,7 @@ function runPlanNat() {
  */
 function runPlanLoc() {
   $.ajax({
-    url: '/run_mgo',
+    url: API + 'run_mgo',
     data: sliderParams['plan-loc'],
     success: showPlanLoc
   });
@@ -249,7 +252,7 @@ function runPlanLoc() {
 function runFindNat() {
   sliderParams['find-nat']['country'] = currentCountry;
   $.ajax({
-    url: '/find_clusters',
+    url: API + 'find_clusters',
     data: sliderParams['find-nat'],
     success: showFindNat
   });
@@ -346,7 +349,7 @@ function showFindNat(data) {
  * @param {*} e 
  */
 function clusterClick(e) {
-  var features = map.queryRenderedFeatures(e.point);
+  let features = map.queryRenderedFeatures(e.point);
   bbox = geojsonExtent(features[0].geometry);
   prepPlanLoc();
 }
@@ -399,18 +402,18 @@ function prepPlanLoc() {
  * @param {*} bounds 
  */
 function buildOverpassApiUrl(overpassQuery, bbox) {
-  var west = bbox[0];
-  var south = bbox[1];
-  var east = bbox[2];
-  var north = bbox[3];
+  let west = bbox[0];
+  let south = bbox[1];
+  let east = bbox[2];
+  let north = bbox[3];
 
-  var bounds = south + ', ' + west + ', ' + north + ', ' + east;
-  var nodeQuery = 'node[' + overpassQuery + '](' + bounds + ');';
-  var wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
-  var relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
-  var query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
-  var baseUrl = 'http://overpass-api.de/api/interpreter';
-  var resultUrl = baseUrl + query;
+  let bounds = south + ', ' + west + ', ' + north + ', ' + east;
+  let nodeQuery = 'node[' + overpassQuery + '](' + bounds + ');';
+  let wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
+  let relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
+  let query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
+  let baseUrl = 'http://overpass-api.de/api/interpreter';
+  let resultUrl = baseUrl + query;
   return resultUrl;
 }
 
@@ -448,7 +451,7 @@ function updateSliders(state) {
   let sliders = $('#sliders');
 
   sliders.html('');
-  for (var name in slider_vals) {
+  for (let name in slider_vals) {
     let vals = slider_vals[name];
     let label = vals.label;
     let unit = vals.unit;
@@ -485,7 +488,7 @@ function updateSummary(state, summaryData) {
   let summary = $('#summary');
 
   summary.html('');
-  for (var name in config) {
+  for (let name in config) {
     let vals = config[name];
     let label = vals.label;
     let unit = vals.unit;
@@ -502,7 +505,7 @@ function updateSummary(state, summaryData) {
 function createLegend(colors, labels) {
   let legend = $('#legend');
   legend.html('');
-  for (var row in colors) {
+  for (let row in colors) {
     let label = labels[row];
     let color = colors[row];
     legend.append('<div><span class="legend-square" style="background-color: ' + color + '"></span><span>' + label + '</span></div>');
@@ -641,7 +644,7 @@ function show(elementId) {
  * @param {*} className 
  */
 function enableClass(elementId, className) {
-  var element = document.getElementById(elementId);
+  let element = document.getElementById(elementId);
   if (!element.classList.contains(className)) {
     element.classList.add(className);
   }
@@ -655,7 +658,7 @@ function enableClass(elementId, className) {
  * @param {*} className 
  */
 function disableClass(elementId, className) {
-  var element = document.getElementById(elementId);
+  let element = document.getElementById(elementId);
   if (element.classList.contains(className)) {
     element.classList.remove(className);
   }

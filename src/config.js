@@ -1,4 +1,4 @@
-var sliderConfigs = {
+const sliderConfigs = {
   'plan-nat': {
     'grid-dist': {
       'default': '1000',
@@ -151,7 +151,7 @@ var sliderConfigs = {
   }
 };
 
-var summaryConfigs = {
+const summaryConfigs = {
   'plan-nat': {
     'tot-cost': {
       'label': 'Total cost',
