@@ -219,3 +219,43 @@ export const summaryConfigs = {
     }
   }
 };
+
+export const countries = {
+  'lesotho': {
+    // bounds are [W, S], [E, N]
+    'bounds': [[27.0344, -30.3513], [29.1263, -28.5838]],
+    'lat': -29.45,
+    'lng': 27.0,
+    'zoom': 8,
+    'urban_elec': 0.47
+  },
+  'rwanda': {
+    'bounds': [[28.329516540, -2.884785794], [31.431263800, -1.002637116]],
+    'lat': -29.45,
+    'lng': 27.0,
+    'zoom': 8,
+    'urban_elec': 0.47
+  }
+};
+
+export const layerColors = {
+  'grid': '#474747', // grey
+  'clustersPlan': {
+    'default': '#1d0b1c', //grey
+    'orig': '#377eb8', // blue
+    'new': '#4daf4a', // green
+    'og': '#e41a1c' // red
+  },
+  'clustersFind': {
+    'default': '#1d0b1c', //grey
+    'top': '#9ebcda', // light blue
+    'bottom': '#6e016b' // purple
+  },
+  'network': '#339900', // green
+  'buildings': {
+    'default': '#005824', // dark green
+    'bottom': '#ccece6', // light
+    'top': '#005824' // dark green
+  },
+  'lv': '#4f5283' // grey
+};

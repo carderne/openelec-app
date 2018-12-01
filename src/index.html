@@ -63,8 +63,11 @@
   </div>
 
   <!-- Choose country page -->
-  <div class="row flex-grow-1 hidden" id="landing">
-    <div class="col fluid px-0"></div>
+  <div class="row flex-grow-1 hidden" id="countries">
+    <div class="col fluid px-10">
+      <h1>Choose a country</h1>
+      <div class="card-deck"id="country-list"></div>
+    </div>
   </div>
 
   <!-- About page -->
@@ -83,7 +86,7 @@
     <div class="col-sm-2 fixed py-3 shad pane">
       <h5 class="ml-3 hidden-sm-down text">Lesotho</h5>
       <button type="button" class="btn btn-primary btn-sm" id="run-model"></button>
-      <button type="button" class="btn btn-secondary btn-sm disabled">Change country</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="change-country">Change country</button>
       <div class="py-3" id="sliders"></div>
     </div>
 
@@ -116,9 +119,6 @@
    </div>
  </div>
 </div>
-
-<!-- Compiled with WebPack -->
-<!-- <script type="text/javascript" src="static/main.js"></script> -->
 
 </body>
 </html>

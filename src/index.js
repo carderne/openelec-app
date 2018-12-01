@@ -17,7 +17,9 @@ import 'bootstrap-slider';
 import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 
 import './style.css';
-import { sliderConfigs, summaryConfigs } from './config.js';
+import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.js';
+
+const images = importImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 
 // API url
 const API = 'http://127.0.0.1:5000/';
@@ -32,13 +34,12 @@ let activeModel;
 let activeLevel;
 
 // keep track of the country we're looking at
-// currently only one option
-let currentCountry = 'Lesotho';
+let country;
 
 // current values of input parametres
 const sliderParams = {};
 
-// variables for right sidebar legend and summary results
+// objects for right sidebar legend and summary results
 const summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 const legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 
@@ -46,40 +47,18 @@ const legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 const clickMsg = 'Click on a cluster to optimise local network';
 const clickBtn = '<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>';
 
-// keep track of preferred national level zoom
-const zoomOut = {'lat': 0, 'lng': 0, 'zoom': 9};
-
 // keep track of local bounding box
-let bbox;
+let clusterBounds;
+let countryBounds;
+const africaBounds = [[-38.751075367, -8.898059419], [9.352373130, 70.375560861]];
+let layersAdded = false;
 
 // to intialise buildings layer before we have the GeoJSON
 const emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
 
-// 
-const layerColors = {
-  'grid': '#474747', // grey
-  'clustersPlan': {
-    'default': '#1d0b1c', //grey
-    'orig': '#377eb8', // blue
-    'new': '#4daf4a', // green
-    'og': '#e41a1c' // red
-  },
-  'clustersFind': {
-    'default': '#1d0b1c', //grey
-    'top': '#9ebcda', // light blue
-    'bottom': '#6e016b' // purple
-  },
-  'network': '#339900', // green
-  'buildings': {
-    'default': '#005824', // dark green
-    'bottom': '#ccece6', // light
-    'top': '#005824' // dark green
-  },
-  'lv': '#4f5283' // grey
-};
-
 // Call init() function on DOM load
 $(document).ready(init);
+//$(window).on('load', init);
 
 /**
  * Called on DOM load.
@@ -87,7 +66,6 @@ $(document).ready(init);
  */
 function init() {
   createMap();
-  addMapLayers();
 
   $('#go-home').click(home);
   $('#go-about').click(about);
@@ -96,6 +74,15 @@ function init() {
   $('#go-plan-big').click(plan);
   $('#go-find').click(find);
   $('#go-find-big').click(find);
+  $('#change-country').click(chooseCountry);
+
+  let countryList = $('#country-list');
+  for (let country in countries) {
+    let countryCap = capFirst(country);
+    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card" style="width: 10rem;"><img class="card-img-top" src="static/' + images['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a>');
+  }
+
+  $('.choose-country').click(explore);
 
   $('.js-loading-bar').modal({
     backdrop: 'static',
@@ -111,9 +98,8 @@ function createMap() {
   map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
-    center: [zoomOut.lng, zoomOut.lat],
-    zoom: zoomOut.zoom
   });
+  map.fitBounds(africaBounds);
   map.addControl(new mapboxgl.NavigationControl());
 }
 
@@ -121,91 +107,77 @@ function createMap() {
  * Add national layers (grid and clusters) for the country.
  */
 function addMapLayers() {
-  $.ajax({
-    url: API + 'get_country',
-    data: { 'country': currentCountry },
-    success: function(data) {
-      zoomOut.lng = data.lng;
-      zoomOut.lat = data.lat;
-      zoomOut.zoom = data.zoom;
-      map.flyTo({
-        center: [zoomOut.lng, zoomOut.lat],
-        zoom: zoomOut.zoom
-      });
-
-      map.addSource('clusters', { type: 'geojson', data: data.clusters });
-      map.addLayer({
-        'id': 'clusters',
-        'type': 'fill',
-        'source': 'clusters',
-        'paint': {
-          'fill-color': [
-            'match',
-            ['get', 'type'],
-            'orig', layerColors.clustersPlan.orig,
-            'new', layerColors.clustersPlan.new,
-            'og', layerColors.clustersPlan.og,
-            layerColors.clustersPlan.default
-          ],
-          'fill-opacity': 0.5,
-        }
-      });
-      map.addLayer({
-        'id': 'clusters-outline',
-        'type': 'line',
-        'source': 'clusters',
-        'paint': {
-          'line-color': [
-            'match',
-            ['get', 'type'],
-            'orig', layerColors.clustersPlan.orig,
-            'new', layerColors.clustersPlan.new,
-            'og', layerColors.clustersPlan.og,
-            layerColors.clustersPlan.default
-          ],
-          'line-width': 2,
-        }
-      });
-
-      map.addSource('grid', { type: 'geojson', data: data.grid });
-      map.addLayer({
-        'id': 'grid',
-        'type': 'line',
-        'source': 'grid',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': layerColors.grid,
-          'line-width': 2
-        }
-      });
-
-      map.addSource('buildings', { type: 'geojson', data: emptyGeoJSON });
-      map.addLayer({
-        'id': 'buildings',
-        'type': 'fill',
-        'source': 'buildings',
-        'paint': {
-          'fill-color': layerColors.buildings.default,
-          'fill-opacity': 0.8
-        }
-      });
-
-      // Change the cursor to a pointer when the mouse is over the states layer.
-      map.on('mouseenter', 'clusters', function () {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-
-      // Change it back to a pointer when it leaves.
-      map.on('mouseleave', 'clusters', function () {
-        map.getCanvas().style.cursor = '';
-      });
-
-      map.on('click', 'clusters', clusterClick);
+  map.addSource('clusters', { type: 'geojson', data: emptyGeoJSON });
+  map.addLayer({
+    'id': 'clusters',
+    'type': 'fill',
+    'source': 'clusters',
+    'paint': {
+      'fill-color': [
+        'match',
+        ['get', 'type'],
+        'orig', layerColors.clustersPlan.orig,
+        'new', layerColors.clustersPlan.new,
+        'og', layerColors.clustersPlan.og,
+        layerColors.clustersPlan.default
+      ],
+      'fill-opacity': 0.5,
     }
   });
+  map.addLayer({
+    'id': 'clusters-outline',
+    'type': 'line',
+    'source': 'clusters',
+    'paint': {
+      'line-color': [
+        'match',
+        ['get', 'type'],
+        'orig', layerColors.clustersPlan.orig,
+        'new', layerColors.clustersPlan.new,
+        'og', layerColors.clustersPlan.og,
+        layerColors.clustersPlan.default
+      ],
+      'line-width': 2,
+    }
+  });
+
+  map.addSource('grid', { type: 'geojson', data: emptyGeoJSON });
+  map.addLayer({
+    'id': 'grid',
+    'type': 'line',
+    'source': 'grid',
+    'layout': {
+      'line-join': 'round',
+      'line-cap': 'round'
+    },
+    'paint': {
+      'line-color': layerColors.grid,
+      'line-width': 2
+    }
+  });
+
+  map.addSource('buildings', { type: 'geojson', data: emptyGeoJSON });
+  map.addLayer({
+    'id': 'buildings',
+    'type': 'fill',
+    'source': 'buildings',
+    'paint': {
+      'fill-color': layerColors.buildings.default,
+      'fill-opacity': 0.8
+    }
+  });
+
+  // Change the cursor to a pointer when the mouse is over the states layer.
+  map.on('mouseenter', 'clusters', function () {
+    map.getCanvas().style.cursor = 'pointer';
+  });
+
+  // Change it back to a pointer when it leaves.
+  map.on('mouseleave', 'clusters', function () {
+    map.getCanvas().style.cursor = '';
+  });
+
+  map.on('click', 'clusters', clusterClick);
 }
 
 /**
@@ -227,7 +199,8 @@ function runModel() {
  * Run API call for planNat.
  */
 function runPlanNat() {
-  sliderParams['plan-nat']['country'] = currentCountry;
+  sliderParams['plan-nat']['country'] = country;
+  sliderParams['plan-nat']['urban_elec'] = countries[country]['urban_elec'];
   $.ajax({
     url: API + 'run_electrify',
     data: sliderParams['plan-nat'],
@@ -239,18 +212,24 @@ function runPlanNat() {
  * Run API call for planLoc.
  */
 function runPlanLoc() {
-  $.ajax({
-    url: API + 'run_mgo',
-    data: sliderParams['plan-loc'],
-    success: showPlanLoc
-  });
+  if (sliderParams['plan-loc']['village']) {
+    $.ajax({
+      url: API + 'run_mgo',
+      data: sliderParams['plan-loc'],
+      success: showPlanLoc
+    });
+  } else {
+    $('#map-announce').html('No building data found');
+    setTimeout(resetAnnounce, 2000);
+    $('#loading-bar').modal('hide');
+  }
 }
 
 /**
  * Run API call for findNat.
  */
 function runFindNat() {
-  sliderParams['find-nat']['country'] = currentCountry;
+  sliderParams['find-nat']['country'] = country;
   $.ajax({
     url: API + 'find_clusters',
     data: sliderParams['find-nat'],
@@ -350,7 +329,7 @@ function showFindNat(data) {
  */
 function clusterClick(e) {
   let features = map.queryRenderedFeatures(e.point);
-  bbox = geojsonExtent(features[0].geometry);
+  clusterBounds = geojsonExtent(features[0].geometry);
   prepPlanLoc();
 }
 
@@ -358,7 +337,7 @@ function clusterClick(e) {
  * Zoom to clicked cluster and prepare for planLoc.
  */
 function prepPlanLoc() {
-  map.fitBounds(bbox, {padding: 20});
+  map.fitBounds(clusterBounds, {padding: 20});
   map.setPaintProperty('clusters', 'fill-opacity', 0.1);
 
   $('#map-announce').html(clickBtn);
@@ -366,21 +345,24 @@ function prepPlanLoc() {
   activeModel = 'plan';
   activeLevel = 'loc';
 
-  let overpassApiUrl = buildOverpassApiUrl('building', bbox);
+  let overpassApiUrl = buildOverpassApiUrl('building', clusterBounds);
   $.get(overpassApiUrl, function (osmDataAsJson) {
     let numBuildings = osmDataAsJson.elements.length;
 
     if (numBuildings > 2000) {
       // will cause slow behaviour or too-long model run
       $('#map-announce').html('Choose a smaller village!');
+      enableClass('run-model', 'disabled');
       setTimeout(resetAnnounce, 2000);
     } else if (numBuildings < 5) {
       // not enough data to work with
       $('#map-announce').html('Choose a village with more buildings!');
+      enableClass('run-model', 'disabled');
       setTimeout(resetAnnounce, 2000);
     } else {
       let villageData = osmtogeojson(osmDataAsJson);
       map.getSource('buildings').setData(villageData);
+      disableClass('run-model', 'disabled');
       sliderParams['plan-loc']['village'] = JSON.stringify(villageData);
     }
   });
@@ -422,13 +404,13 @@ function buildOverpassApiUrl(overpassQuery, bbox) {
  * and show appropriate sidebar content.
  */
 function zoomToNat() {
-  map.flyTo({
-    center: [zoomOut.lng, zoomOut.lat],
-    zoom: zoomOut.zoom
-  });
+  countryBounds = countries[country].bounds;
+  let camera = map.cameraForBounds(countryBounds, {padding: -200});
+  map.flyTo(camera);
 
   map.setPaintProperty('clusters', 'fill-opacity', 0.5);
 
+  disableClass('run-model', 'disabled');
   $('#map-announce').html(clickMsg);
 
   let state = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
@@ -516,15 +498,15 @@ function createLegend(colors, labels) {
 /**
  * Display the main explore screen with map centered.
  */
-function explore() {
+function chooseCountry() {
+  if (!layersAdded) {
+    addMapLayers();
+    layersAdded = true;
+  }
   hide('landing');
-  show('explore');
+  hide('explore');
   hide('about');
-
-  $('#map-announce').html(clickMsg);
-  show('map-announce-outer');
-
-  map.resize();
+  show('countries');
 }
 
 /**
@@ -537,7 +519,7 @@ function plan() {
   activeLevel = 'nat';
   activeMode('go-plan');
   $('#run-model').html('Run model');
-
+  disableClass('run-model', 'disabled');
   updateSliders('plan-nat');
 
   $('#summary').html(summaryHtml['plan-nat']);
@@ -549,7 +531,14 @@ function plan() {
   let labels = {'default': 'Un-modelled', 'orig': 'Currently connected', 'new': 'New connections', 'og': 'Off-grid'};
   legendHtml['plan-nat'] = createLegend(colors, labels);
 
-  explore();
+  if (!country) {
+    chooseCountry();
+  } else {
+    hide('landing');
+    show('explore');
+    hide('about');
+    hide('countries');
+  }
 }
 
 /**
@@ -560,7 +549,7 @@ function find() {
   activeLevel = 'nat';
   activeMode('go-find');
   $('#run-model').html('Filter');
-
+  disableClass('run-model', 'disabled');
   updateSliders('find-nat');
 
   $('#summary').html(summaryHtml['find-nat']);
@@ -572,7 +561,40 @@ function find() {
   let labels = {'default': 'Un-modelled', 'bottom': 'Low priority', 'top': 'High priority'};
   legendHtml['find-nat'] = createLegend(colors, labels);
 
-  explore();
+  if (!country) {
+    chooseCountry();
+  } else {
+    hide('landing');
+    show('explore');
+    hide('about');
+    hide('countries');
+  }
+}
+
+function explore() {
+  country = this.id;
+  $.ajax({
+    url: API + 'get_country',
+    data: { 'country': country },
+    success: function(data) {
+      map.getSource('grid').setData(data.grid);
+      map.getSource('clusters').setData(data.clusters);
+    }
+  });
+
+  $('#map-announce').html(clickMsg);
+  show('map-announce-outer');
+
+  countryBounds = countries[country].bounds;
+  let camera = map.cameraForBounds(countryBounds, {padding: -200});
+  map.jumpTo(camera);
+
+  hide('landing');
+  show('explore');
+  hide('about');
+  hide('countries');
+
+  map.resize();
 }
 
 /**
@@ -662,4 +684,14 @@ function disableClass(elementId, className) {
   if (element.classList.contains(className)) {
     element.classList.remove(className);
   }
+}
+
+function importImages(r) {
+  let images = {};
+  r.keys().map((item) => { images[item.replace('./', '')] = r(item); });
+  return images;
+}
+
+function capFirst(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
