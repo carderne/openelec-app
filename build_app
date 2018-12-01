@@ -10,5 +10,6 @@ npm run dev
 #cp dist/static/*.js ../openelec_app/openelec_app/static/
 #echo "Copied JS to ../openelec_app/openelec_app/static/"
 
+#echo openelec.surge.sh > CNAME
 #cd dist
 #surge

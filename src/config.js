@@ -1,4 +1,4 @@
-const sliderConfigs = {
+export const sliderConfigs = {
   'plan-nat': {
     'grid-dist': {
       'default': '1000',
@@ -151,7 +151,7 @@ const sliderConfigs = {
   }
 };
 
-const summaryConfigs = {
+export const summaryConfigs = {
   'plan-nat': {
     'tot-cost': {
       'label': 'Total cost',
@@ -219,5 +219,3 @@ const summaryConfigs = {
     }
   }
 };
-
-export { sliderConfigs, summaryConfigs };
