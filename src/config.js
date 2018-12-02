@@ -165,10 +165,10 @@ export const sliderConfigs = {
       'unit': 'km'
     },
     'max-ntl': {
-      'default': '50',
-      'label': 'Minimum night time lights',
+      'default': '200',
+      'label': 'Maximum night time lights',
       'max': '255',
-      'min': '0',
+      'min': '150',
       'step': '5',
       'unit': ''
     },

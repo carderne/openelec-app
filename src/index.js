@@ -210,7 +210,7 @@ function runPlanNat() {
   sliderParams['plan-nat']['country'] = country;
   sliderParams['plan-nat']['urban_elec'] = countries[country]['urban_elec'];
   $.ajax({
-    url: API + 'run_electrify',
+    url: API + 'plan_nat',
     data: sliderParams['plan-nat'],
     success: showPlanNat
   });
@@ -223,7 +223,7 @@ function runPlanLoc() {
   if (sliderParams['plan-loc']['village']) {
 
     $.ajax({
-      url: API + 'run_mgo',
+      url: API + 'plan_loc',
       data: sliderParams['plan-loc'],
       success: showPlanLoc
     });
@@ -241,7 +241,7 @@ function runPlanLoc() {
 function runFindNat() {
   sliderParams['find-nat']['country'] = country;
   $.ajax({
-    url: API + 'find_clusters',
+    url: API + 'find_nat',
     data: sliderParams['find-nat'],
     success: showFindNat
   });
