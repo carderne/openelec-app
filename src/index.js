@@ -22,7 +22,8 @@ import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.
 const images = importImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 
 // API url
-const API = 'http://127.0.0.1:5000/';
+//const API = 'http://127.0.0.1:5000/api/v1/';
+const API = 'http://35.240.48.205:80/api/v1/';
 
 // object for Mapbox GL map
 let map;
@@ -213,11 +214,13 @@ function runPlanNat() {
  */
 function runPlanLoc() {
   if (sliderParams['plan-loc']['village']) {
+
     $.ajax({
       url: API + 'run_mgo',
       data: sliderParams['plan-loc'],
       success: showPlanLoc
     });
+    
   } else {
     $('#map-announce').html('No building data found');
     setTimeout(resetAnnounce, 2000);

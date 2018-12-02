@@ -1,6 +1,6 @@
-#npm run build
+npm run build
 
-npm run dev
+#npm run dev
 
 #rm ../openelec_app/openelec_app/templates/*
 #cp dist/index.html ../openelec_app/openelec_app/templates/
@@ -10,6 +10,7 @@ npm run dev
 #cp dist/static/*.js ../openelec_app/openelec_app/static/
 #echo "Copied JS to ../openelec_app/openelec_app/static/"
 
-#cd dist
-#echo openelec.surge.sh > CNAME
-#surge
+cd dist
+#echo https://openelec.surge.sh > CNAME
+echo http://openelec.surge.sh > CNAME
+surge
