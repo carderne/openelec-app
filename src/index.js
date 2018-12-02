@@ -266,6 +266,14 @@ function showPlanNat(data) {
   }
 
   map.getSource('clusters').setData(data.clusters);
+  map.setPaintProperty('clusters', 'fill-color', [
+    'match',
+    ['get', 'type'],
+    'orig', layerColors.clustersPlan.orig,
+    'new', layerColors.clustersPlan.new,
+    'og', layerColors.clustersPlan.og,
+    layerColors.clustersPlan.default
+  ]);
 
   updateSummary('plan-nat', data.summary);
   $('#loading-bar').modal('hide');
