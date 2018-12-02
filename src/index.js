@@ -21,9 +21,13 @@ import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.
 
 const images = importImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 
-// API url
-//const API = 'http://127.0.0.1:5000/api/v1/';
-const API = 'http://35.240.48.205:80/api/v1/';
+// Use local API URL for dev, and server for prod
+let API;
+if (process.env.NODE_ENV === 'prod') {
+  API = 'https://openelec.rdrn.me/api/v1/';
+} else {
+  API = 'http://127.0.0.1:5000/api/v1/';
+} 
 
 // object for Mapbox GL map
 let map;

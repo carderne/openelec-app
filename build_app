@@ -11,6 +11,6 @@ npm run build
 #echo "Copied JS to ../openelec_app/openelec_app/static/"
 
 cd dist
-#echo https://openelec.surge.sh > CNAME
-echo http://openelec.surge.sh > CNAME
+echo https://openelec.surge.sh > CNAME
+#echo http://openelec.surge.sh > CNAME
 surge

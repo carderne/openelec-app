@@ -24,7 +24,8 @@ module.exports = {
       // both options are optional
       filename: '[name].[hash].css',
       chunkFilename: '[id].[hash].css',
-    })
+    }),
+    new webpack.EnvironmentPlugin(['NODE_ENV'])
   ],
   output: {
     filename: '[name].[contenthash].js',
