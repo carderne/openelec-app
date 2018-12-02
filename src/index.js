@@ -409,7 +409,7 @@ function buildOverpassApiUrl(overpassQuery, bbox) {
   let wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
   let relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
   let query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
-  let baseUrl = 'http://overpass-api.de/api/interpreter';
+  let baseUrl = 'https://overpass-api.de/api/interpreter';
   let resultUrl = baseUrl + query;
   return resultUrl;
 }
@@ -528,8 +528,6 @@ function chooseCountry() {
  * Called by clicking the 'plan' button.
  */
 function plan() {
-  // pushState doesn't work from static file, test with Flask
-  //window.history.pushState({}, 'OpenElec | Plan', 'openelec.com/plan');
   activeModel = 'plan';
   activeLevel = 'nat';
   activeMode('go-plan');
