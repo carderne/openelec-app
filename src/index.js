@@ -19,6 +19,8 @@ import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 import './style.css';
 import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.js';
 
+import * as d3 from 'd3';
+
 const images = importImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 
 // Use local API URL for dev, and server for prod
@@ -85,7 +87,7 @@ function init() {
   let countryList = $('#country-list');
   for (let country in countries) {
     let countryCap = capFirst(country);
-    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card" style="width: 10rem;"><img class="card-img-top" src="static/' + images['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a>');
+    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card" style="width: 10rem;"><img class="card-img-top" src="' + images['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a>');
   }
 
   $('.choose-country').click(explore);
@@ -281,6 +283,14 @@ function showPlanNat(data) {
   ]);
 
   updateSummary('plan-nat', data.summary);
+
+  let chartData = [
+    { 'type': 'Existing', 'pop': data.summary['orig-conn-pop'] },
+    { 'type': 'New', 'pop': data.summary['new-conn-pop'] },
+    { 'type': 'Off-grid', 'pop': data.summary['new-og-pop'] }
+  ];
+
+  createChart(chartData);
   $('#loading-bar').modal('hide');
 }
 
@@ -717,4 +727,76 @@ function importImages(r) {
  */
 function capFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * 
+ * @param {*} dataset 
+ */
+function createChart(dataset) {
+  var outerWidth = 300;
+  var outerHeight = 200;
+  var margin = { left: 50, top: 30, right: 30, bottom: 50 };
+  var barPadding = 0.2;
+
+  var xColumn = 'type';
+  var yColumn = 'pop';
+  var colorColumn = 'type';
+
+  function colorPicker(type) {
+    if (type == 'Existing') {
+      return layerColors.clustersPlan.orig;
+    } else if (type == 'New') {
+      return layerColors.clustersPlan.new;
+    } else {
+      return layerColors.clustersPlan.og;
+    }
+  }
+
+  var innerWidth  = outerWidth  - margin.left - margin.right;
+  var innerHeight = outerHeight - margin.top  - margin.bottom;
+
+  $('#chart').html('<h3 class="text">Newly connected population</h3>');
+  var svg = d3.select('#chart').append('svg')
+    .attr('width',  outerWidth)
+    .attr('height', outerHeight);
+  var g = svg.append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+  var xAxisG = g.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', 'translate(0,' + innerHeight + ')');
+  var yAxisG = g.append('g')
+    .attr('class', 'y axis');
+
+  var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], barPadding);
+  var yScale = d3.scale.linear().range([innerHeight, 0]);
+
+  var xAxis = d3.svg.axis().scale(xScale).orient('bottom')
+    .outerTickSize(0);
+  var yAxis = d3.svg.axis().scale(yScale).orient('left')
+    .ticks(3)
+    .tickFormat(d3.format('s'))
+    .outerTickSize(0);
+
+  xScale.domain(dataset.map( function (d){ return d[xColumn]; }));
+  yScale.domain([0, d3.max(dataset, function (d){ return d[yColumn]; })]);
+
+  xAxisG
+    .call(xAxis)
+    .selectAll('text')  
+    .attr('dx', '-0.4em')
+    .attr('dy', '1.24em')
+    .attr('transform', 'rotate(-16)' );
+
+  yAxisG.call(yAxis);
+
+  var bars = g.selectAll('rect').data(dataset);
+  bars.enter().append('rect')
+    .attr('width', xScale.rangeBand());
+  bars
+    .attr('x', function (d){ return xScale(d[xColumn]); })
+    .attr('y', function (d){ return yScale(d[yColumn]); })
+    .attr('height', function (d){ return innerHeight - yScale(d[yColumn]); })
+    .attr('fill', function (d){ return colorPicker(d[colorColumn]); });
+  bars.exit().remove();
 }
