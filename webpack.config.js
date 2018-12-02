@@ -16,7 +16,8 @@ module.exports = {
       /* minify: true, */
       /* hash: true, */
       template: './src/index.html',
-      filename: path.resolve(__dirname, 'dist', 'index.html')
+      filename: path.resolve(__dirname, 'dist', 'index.html'),
+      favicon: 'src/icons/favicon.ico'
     }),
     new webpack.HashedModuleIdsPlugin(),
     new MiniCssExtractPlugin({
@@ -29,7 +30,7 @@ module.exports = {
   ],
   output: {
     filename: '[name].[contenthash].js',
-    path: path.resolve(__dirname, 'dist', 'static')
+    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [

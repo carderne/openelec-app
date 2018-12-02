@@ -1,16 +1,7 @@
 npm run build
 
-#npm run dev
-
-#rm ../openelec_app/openelec_app/templates/*
-#cp dist/index.html ../openelec_app/openelec_app/templates/
-#echo "Copied index.html to ../openelec_app/openelec_app/templates/"
-
-#rm ../openelec_app/openelec_app/static/*
-#cp dist/static/*.js ../openelec_app/openelec_app/static/
-#echo "Copied JS to ../openelec_app/openelec_app/static/"
+cp src/icons/favicon-1024.png dist
 
 cd dist
 echo https://openelec.surge.sh > CNAME
-#echo http://openelec.surge.sh > CNAME
 surge

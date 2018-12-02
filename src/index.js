@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === 'prod') {
   API = 'https://openelec.rdrn.me/api/v1/';
 } else {
   API = 'http://127.0.0.1:5000/api/v1/';
-} 
+}
 
 // object for Mapbox GL map
 let map;
@@ -72,6 +72,7 @@ $(document).ready(init);
 function init() {
   createMap();
 
+  //$('.favicon').attr('href', images['favicon.ico']);
   $('#go-home').click(home);
   $('#go-about').click(about);
   $('#run-model').click(runModel);
