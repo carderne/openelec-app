@@ -55,6 +55,14 @@ export const sliderConfigs = {
       'min': '0',
       'step': '1',
       'unit': 'USD/m2'
+    },
+    'urban-elec': {
+      'default': '50',
+      'label': 'Urban electrification rate',
+      'max': '100',
+      'min': '0',
+      'step': '5',
+      'unit': '%'
     }
   },
   'plan-loc': {
@@ -224,17 +232,9 @@ export const countries = {
   'lesotho': {
     // bounds are [W, S], [E, N]
     'bounds': [[27.0344, -30.3513], [29.1263, -28.5838]],
-    'lat': -29.45,
-    'lng': 27.0,
-    'zoom': 8,
-    'urban_elec': 0.47
   },
   'rwanda': {
     'bounds': [[28.329516540, -2.884785794], [31.431263800, -1.002637116]],
-    'lat': -29.45,
-    'lng': 27.0,
-    'zoom': 8,
-    'urban_elec': 0.47
   }
 };
 
