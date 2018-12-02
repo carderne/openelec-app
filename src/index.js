@@ -283,14 +283,6 @@ function showPlanNat(data) {
   ]);
 
   updateSummary('plan-nat', data.summary);
-
-  let chartData = [
-    { 'type': 'Existing', 'pop': data.summary['orig-conn-pop'] },
-    { 'type': 'New', 'pop': data.summary['new-conn-pop'] },
-    { 'type': 'Off-grid', 'pop': data.summary['new-og-pop'] }
-  ];
-
-  createChart(chartData);
   $('#loading-bar').modal('hide');
 }
 
@@ -502,6 +494,16 @@ function updateSummary(state, summaryData) {
     let unit = vals.unit;
     summary.append('<p>' + label + ': ' + summaryData[name].toFixed(0) + ' ' + unit + '</p>');
   }
+
+  if (state == 'plan-nat') {
+    let chartData = [
+      { 'type': 'Existing', 'pop': summaryData['orig-conn-pop'] },
+      { 'type': 'New', 'pop': summaryData['new-conn-pop'] },
+      { 'type': 'Off-grid', 'pop': summaryData['new-og-pop'] }
+    ];
+    createChart(chartData);
+  }
+
   summaryHtml[state] = summary.html();
 }
 
@@ -756,8 +758,8 @@ function createChart(dataset) {
   var innerWidth  = outerWidth  - margin.left - margin.right;
   var innerHeight = outerHeight - margin.top  - margin.bottom;
 
-  $('#chart').html('<h3 class="text">Newly connected population</h3>');
-  var svg = d3.select('#chart').append('svg')
+  $('#summary').append('<h3 class="text">Newly connected population</h3>');
+  var svg = d3.select('#summary').append('svg')
     .attr('width',  outerWidth)
     .attr('height', outerHeight);
   var g = svg.append('g')

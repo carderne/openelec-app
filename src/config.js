@@ -8,6 +8,14 @@ export const sliderConfigs = {
       'step': '500',
       'unit': 'm'
     },
+    'min-ntl': {
+      'default': '50',
+      'label': 'Minimum night lights connected',
+      'max': '255',
+      'min': '0',
+      'step': '5',
+      'unit': ''
+    },
     'min-pop': {
       'default': '100',
       'label': 'Minimum population',
@@ -155,7 +163,15 @@ export const sliderConfigs = {
       'min': '0',
       'step': '1',
       'unit': 'km'
-    }
+    },
+    'max-ntl': {
+      'default': '50',
+      'label': 'Minimum night time lights',
+      'max': '255',
+      'min': '0',
+      'step': '5',
+      'unit': ''
+    },
   }
 };
 
