@@ -53,13 +53,12 @@ const summaryHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 const legendHtml = {'plan-nat': '', 'plan-loc': '', 'find-nat': ''};
 
 // message displayed at national-level display
-const clickMsg = 'Click on a cluster to optimise local network';
+const clickMsg = '<p>Click on a cluster to optimise local network</p>';
 const clickBtn = '<button type="button" class="btn btn-warning btn-block" id="btn-zoom-out">Click to zoom out</button>';
 
 // keep track of local bounding box
 let clusterBounds;
 let countryBounds;
-const africaBounds = [[-38.751075367, -8.898059419], [9.352373130, 70.375560861]];
 let layersAdded = false;
 
 // to intialise buildings layer before we have the GeoJSON
@@ -109,8 +108,12 @@ function createMap() {
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
   });
-  map.fitBounds(africaBounds);
-  map.addControl(new mapboxgl.NavigationControl());
+
+  map.addControl(new mapboxgl.ScaleControl({
+    maxWidth: 200,
+    unit: 'metric',
+  }), 'bottom-right');
+  map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 }
 
 /**

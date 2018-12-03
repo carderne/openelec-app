@@ -48,13 +48,13 @@ nav {
 }
 
 .map-overlay {
-    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    /* font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif; */
     position: absolute;
-    width: 200px;
+    width: 220px;
     top: 100px;
     left: 50%;
 	padding: 10px;
-	margin-left: -100px;
+	margin-left: -110px; /* half of width */
 }
 
 .map-overlay .map-overlay-inner {
