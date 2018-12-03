@@ -534,7 +534,6 @@ function updateSummary(state, summaryData) {
     ];
     createChart(chartData);
   }
-
   summaryHtml[state] = summary.html();
 }
 
@@ -769,9 +768,9 @@ function capFirst(string) {
  * @param {*} dataset 
  */
 function createChart(dataset) {
-  var outerWidth = 300;
+  var outerWidth = 250;
   var outerHeight = 200;
-  var margin = { left: 50, top: 30, right: 30, bottom: 50 };
+  var margin = { left: 50, top: 30, right: 0, bottom: 50 };
   var barPadding = 0.2;
 
   var xColumn = 'type';
