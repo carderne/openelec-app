@@ -16,12 +16,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-slider';
 import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 
+import 'typeface-chivo';
+
 import './style.css';
 import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.js';
 
 import * as d3 from 'd3';
 
-const images = importImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
+const flags = importImages(require.context('./flags', false, /\.(png|jpe?g|svg)$/));
 
 // Use local API URL for dev, and server for prod
 let API;
@@ -87,7 +89,7 @@ function init() {
   let countryList = $('#country-list');
   for (let country in countries) {
     let countryCap = capFirst(country);
-    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card" style="width: 10rem;"><img class="card-img-top" src="' + images['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a>');
+    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card shadow" style="width: 10rem;"><img class="card-img-top" src="' + flags['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a>');
   }
 
   $('.choose-country').click(explore);

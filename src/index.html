@@ -2,17 +2,17 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>OpenElec</title>
+<title>openelec</title>
 
-<meta name="description" content="openelec is a general tool for finding opportunities in electricity access.">
+<meta name="description" content="Find opportunities and optimise pathways for universal electricity access.">
 <meta property="og:site_name" content="openelec">
 <meta property="og:type" content="website">
 <meta property="og:title" content="openelec">
-<meta property="og:description" content="openelec is a general tool for finding opportunities in electricity access.">
+<meta property="og:description" content="Find opportunities and optimise pathways for universal electricity access.">
 <meta property="og:url" content="/">
 <meta property="og:image" content="favicon-1024.png">
 <meta name="twitter:title" content="openelec">
-<meta name="twitter:description" content="openelec is a general tool for finding opportunities in electricity access.">
+<meta name="twitter:description" content="Find opportunities and optimise pathways for universal electricity access.">
 <meta name="twitter:url" content="/">
 <meta name="twitter:image" content="favicon-1024.png">
 <meta property="og:image:width" content="1920">
@@ -33,7 +33,7 @@
   <div class="navbar-collapse collapse dual-nav w-50 order-1 order-md-0">
     <ul class="navbar-nav">
       <li class="nav-item active">
-        <a class="brand navbar-brand pl-0" href="#" id="go-home">OpenElec</a>
+        <a class="brand navbar-brand pl-0" href="#" id="go-home">openelec</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="https://oobica.com">Oobica</a>
@@ -64,16 +64,20 @@
 
   <!-- Landing page -->
   <div class="row flex-grow-1" id="landing">
-    <div class="jumbotron w-100 h-100">
-      <h1 class="brand">OpenElec</h1>
-      <span class="d-inline-block text" style="max-width: 600px;">
-        OpenElec is a prototype for a general purpose tool for creating optimised national electricity access pathways,
-        and finding villages for private off-grid development. The tool has functionality for both national- and
-        local-level analysis.
-      </span>
+    <div class="jumbotron">
+      <h1 class="display-1" style="display:inline">openelec</h1> BETA
+      <br>
+      <p class="lead">
+        Find opportunities and optimise pathways for universal electricity access.
+        Combine high-resolution satellite and OpenStreetMap data with advanced optimisation strategies
+        to find the best technologies and investments down to household level.
+      </p>
+      <hr class="my-4">
       <h3>Choose a model mode below to start exploring!</h3>
-      <button type="button" class="btn btn-primary btn-lg" id="go-plan-big">Plan pathways</button>
-      <button type="button" class="btn btn-primary btn-lg" id="go-find-big">Find opportunities</button>
+      <p class="lead">
+        <button type="button" class="btn btn-primary btn-lg" id="go-plan-big">Plan pathways</button>
+        <button type="button" class="btn btn-primary btn-lg" id="go-find-big">Find opportunities</button>
+      </p>
     </div>
   </div>
 
@@ -87,11 +91,21 @@
 
   <!-- About page -->
   <div class="row flex-grow-1 hidden" id="about">
-    <div class="jumbotron w-100 h-100">
-      <h1 class="brand">About OpenElec</h1>      
-      <p>This tool was created to showcase a frontend to the open source tool OpenElec, available <a href="https://github.com/carderne/openelec">here</a> on GitHub.</p>
-      <p>Development is done by Chris Arderne, with hopefully more contributors in the future.</p>
-    </div>
+    <div class="jumbotron">
+        <h1 class="display-4">About openelec</h1>
+          <p class="lead">
+            This is a frontend to showcase some of the functionality of the open source tool openelec,
+            available <a href="https://github.com/carderne/openelec">here</a>. Please get in
+            touch on my GitHub page.
+          </p>
+          <p class="lead">
+            This was developed following my experiences with electrixity access planning tools, which
+            are largely proprietary, expensive and bad. At the same time, there aren't many available
+            tools for finding off-grid electricity access options that take advantage of all the data
+            available and allow modelling freedom in choosing sites.
+          </p>
+          <p>© Chris Arderne</p>
+      </div>
   </div>
 
   <!-- Main explore page -->
