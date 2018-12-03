@@ -768,9 +768,10 @@ function capFirst(string) {
  * @param {*} dataset 
  */
 function createChart(dataset) {
+  // TODO make responsive
   var outerWidth = 250;
   var outerHeight = 200;
-  var margin = { left: 50, top: 30, right: 0, bottom: 50 };
+  var margin = { left: 0, top: 30, right: 0, bottom: 50 };
   var barPadding = 0.2;
 
   var xColumn = 'type';
@@ -790,10 +791,13 @@ function createChart(dataset) {
   var innerWidth  = outerWidth  - margin.left - margin.right;
   var innerHeight = outerHeight - margin.top  - margin.bottom;
 
+  
   $('#summary').append('<h3 class="text">Newly connected population</h3>');
+
   var svg = d3.select('#summary').append('svg')
-    .attr('width',  outerWidth)
+    .attr('width', '100%')
     .attr('height', outerHeight);
+
   var g = svg.append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
   var xAxisG = g.append('g')
