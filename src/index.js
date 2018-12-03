@@ -178,16 +178,48 @@ function addMapLayers() {
   });
 
   // Change the cursor to a pointer when the mouse is over the states layer.
-  map.on('mouseenter', 'clusters', function () {
+  // And show hover popup
+  map.on('mouseenter', 'clusters', function (e) {
     map.getCanvas().style.cursor = 'pointer';
+
+    let props = e.features[0].properties;
+    let id = props.fid;
+    let pop = props.pop.toFixed(0);
+    let area = (props.area/1e6).toFixed(2);
+    let ntl = props.ntl;
+    let gdp = props.gdp;
+    let grid = (props['grid_dist']/1e3).toFixed(2);
+    let travel = (props.travel/60).toFixed(0);
+    let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + '<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + ' hrs</p>';
+
+    popup.setLngLat([e.lngLat.lng, e.lngLat.lat])
+      .setHTML(text)
+      .addTo(map);
   });
 
   // Change it back to a pointer when it leaves.
+  // And remove popup
   map.on('mouseleave', 'clusters', function () {
     map.getCanvas().style.cursor = '';
+    popup.remove();
   });
 
   map.on('click', 'clusters', clusterClick);
+
+  // Create a popup, but don't add it to the map yet.
+  let popup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+  });
+
+  map.on('mouseenter', 'places', function(e) {
+    // Change the cursor style as a UI indicator.
+    map.getCanvas().style.cursor = 'pointer';
+
+    
+});
+
+
 }
 
 /**
@@ -275,6 +307,7 @@ function showPlanNat(data) {
   }
 
   map.getSource('clusters').setData(data.clusters);
+
   map.setPaintProperty('clusters', 'fill-color', [
     'match',
     ['get', 'type'],
