@@ -636,6 +636,7 @@ function home() {
   show('landing');
   hide('explore');
   hide('about');
+  hide('countries');
   hide('map-announce-outer');
 }
 
@@ -647,6 +648,7 @@ function about() {
   hide('landing');
   hide('explore');
   show('about');
+  hide('countries');
   hide('map-announce-outer');
 }
 
