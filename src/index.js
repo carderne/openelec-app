@@ -180,6 +180,12 @@ function addMapLayers() {
     }
   });
 
+  // Create a popup, but don't add it to the map yet.
+  let popup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+  });
+
   // Change the cursor to a pointer when the mouse is over the states layer.
   // And show hover popup
   map.on('mouseenter', 'clusters', function (e) {
@@ -208,21 +214,6 @@ function addMapLayers() {
   });
 
   map.on('click', 'clusters', clusterClick);
-
-  // Create a popup, but don't add it to the map yet.
-  let popup = new mapboxgl.Popup({
-    closeButton: false,
-    closeOnClick: false
-  });
-
-  map.on('mouseenter', 'places', function(e) {
-    // Change the cursor style as a UI indicator.
-    map.getCanvas().style.cursor = 'pointer';
-
-    
-});
-
-
 }
 
 /**

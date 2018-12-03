@@ -1,7 +1,6 @@
 npm run build
 
 cp src/icons/favicon-1024.png dist
+echo https://openelec.surge.sh > dist/CNAME
 
-cd dist
-echo https://openelec.surge.sh > CNAME
-surge
+surge dist
