@@ -1,12 +1,13 @@
 export const sliderConfigs = {
   'plan-nat': {
     'grid-dist': {
-      'default': '1000',
+      'default': '1',
       'label': 'Grid dist connected',
-      'max': '5000',
+      'max': '5',
       'min': '0',
-      'step': '500',
-      'unit': 'm'
+      'step': '0.5',
+      'unit': 'km',
+      'tooltip': 'Consider clusters within this distance as already connected.'
     },
     'min-ntl': {
       'default': '50',
@@ -14,7 +15,8 @@ export const sliderConfigs = {
       'max': '255',
       'min': '0',
       'step': '5',
-      'unit': ''
+      'unit': '',
+      'tooltip': 'Minimum night lights value to consider a cluster already connected.'
     },
     'min-pop': {
       'default': '100',
@@ -22,7 +24,8 @@ export const sliderConfigs = {
       'max': '1000',
       'min': '0',
       'step': '50',
-      'unit': ''
+      'unit': '',
+      'tooltip': 'Exclude from analysis villages with less that this population.'
     },
     'demand-ppm': {
       'default': '6',
@@ -30,7 +33,8 @@ export const sliderConfigs = {
       'max': '100',
       'min': '0',
       'step': '2',
-      'unit': 'kWh/p/month'
+      'unit': 'kWh/p/month',
+      'tooltip': 'The average electricity demand per person in all clusters.'
     },
     'mg-gen-cost': {
       'default': '4000',
@@ -38,7 +42,8 @@ export const sliderConfigs = {
       'max': '10000',
       'min': '0',
       'step': '500',
-      'unit': 'USD/kW'
+      'unit': 'USD/kW',
+      'tooltip': 'Installed cost of a minigrid system, excluding distribution.'
     },
     'mg-dist-cost': {
       'default': '2',
@@ -46,7 +51,8 @@ export const sliderConfigs = {
       'max': '10',
       'min': '0',
       'step': '1',
-      'unit': 'USD/m2'
+      'unit': 'USD/m2',
+      'tooltip': 'Minigrid distribution cost as a function of village size.'
     },
     'grid-mv-cost': {
       'default': '50',
@@ -54,7 +60,8 @@ export const sliderConfigs = {
       'max': '200',
       'min': '0',
       'step': '10',
-      'unit': 'USD/m'
+      'unit': 'USD/m',
+      'tooltip': 'Grid MV lines extension cost.'
     },
     'grid-lv-cost': {
       'default': '2',
@@ -62,7 +69,8 @@ export const sliderConfigs = {
       'max': '10',
       'min': '0',
       'step': '1',
-      'unit': 'USD/m2'
+      'unit': 'USD/m2',
+      'tooltip': 'Local in-cluster grid distribution cost as a function of village size.'
     },
     'urban-elec': {
       'default': '50',
@@ -70,7 +78,8 @@ export const sliderConfigs = {
       'max': '100',
       'min': '0',
       'step': '5',
-      'unit': '%'
+      'unit': '%',
+      'tooltip': 'Current urban electrification rate.'
     }
   },
   'plan-loc': {
@@ -80,7 +89,8 @@ export const sliderConfigs = {
       'max': '100',
       'min': '0',
       'step': '5',
-      'unit': 'm2'
+      'unit': 'm2',
+      'tooltip': 'Exclude from analysis buildings below this size.'
     },
     'demand': {
       'default': '10',
@@ -88,7 +98,8 @@ export const sliderConfigs = {
       'max': '100',
       'min': '0',
       'step': '2',
-      'unit': 'kWh/person/month'
+      'unit': 'kWh/person/month',
+      'tooltip': 'Electricity demand per person.'
     },
     'tariff': {
       'default': '0.5',
@@ -96,7 +107,8 @@ export const sliderConfigs = {
       'max': '1',
       'min': '0',
       'step': '0.05',
-      'unit': 'USD/kWh'
+      'unit': 'USD/kWh',
+      'tooltip': 'Tariff to be charged to consumers.'
     },
     'gen-cost': {
       'default': '1000',
@@ -104,7 +116,8 @@ export const sliderConfigs = {
       'max': '10000',
       'min': '0',
       'step': '500',
-      'unit': 'USD/kW'
+      'unit': 'USD/kW',
+      'tooltip': 'Installed cost of a minigrid system, excluding distribution.'
     },
     'wire-cost': {
       'default': '10',
@@ -112,7 +125,8 @@ export const sliderConfigs = {
       'max': '50',
       'min': '0',
       'step': '5',
-      'unit': 'USD/m'
+      'unit': 'USD/m',
+      'tooltip': 'Cost of local distribution wires.'
     },
     'conn-cost': {
       'default': '100',
@@ -120,7 +134,8 @@ export const sliderConfigs = {
       'max': '500',
       'min': '0',
       'step': '20',
-      'unit': 'USD/building'
+      'unit': 'USD/building',
+      'tooltip': 'The connection cost per building.'
     },
     'opex-ratio': {
       'default': '2',
@@ -128,7 +143,8 @@ export const sliderConfigs = {
       'max': '10',
       'min': '0',
       'step': '1',
-      'unit': '%'
+      'unit': '%',
+      'tooltip': 'Annual operating costs as a percentage of CAPEX.'
     },
     'years': {
       'default': '20',
@@ -136,7 +152,8 @@ export const sliderConfigs = {
       'max': '30',
       'min': '0',
       'step': '1',
-      'unit': 'years'
+      'unit': 'years',
+      'tooltip': 'Years over which to amortise project.'
     },
     'discount-rate': {
       'default': '6',
@@ -144,7 +161,8 @@ export const sliderConfigs = {
       'max': '20',
       'min': '0',
       'step': '1',
-      'unit': '%'
+      'unit': '%',
+      'tooltip': 'For calculating NPV.'
     }
   },
   'find-nat': {
@@ -154,7 +172,8 @@ export const sliderConfigs = {
       'max': '2000',
       'min': '0',
       'step': '100',
-      'unit': ''
+      'unit': '',
+      'tooltip': 'Exclude clusters with less than this population.'
     },
     'min-grid-dist': {
       'default': '10',
@@ -162,7 +181,8 @@ export const sliderConfigs = {
       'max': '20',
       'min': '0',
       'step': '1',
-      'unit': 'km'
+      'unit': 'km',
+      'tooltip': 'Exclude clusters closer than this to the grid.'
     },
     'max-ntl': {
       'default': '200',
@@ -170,7 +190,8 @@ export const sliderConfigs = {
       'max': '255',
       'min': '150',
       'step': '5',
-      'unit': ''
+      'unit': '',
+      'tooltip': 'Exclude clusters above this level of night lights.'
     },
   }
 };

@@ -80,3 +80,33 @@ nav {
     height: 5px;
     margin-right: 5px;
 }
+
+.ttip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip text */
+.ttip .ttiptext {
+    visibility: hidden;
+    width: 180px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    opacity: 0.9;
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+
+    bottom: 100%;
+    left: 50%;
+    margin-left: -90px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.ttip:hover .ttiptext {
+    visibility: visible;
+}

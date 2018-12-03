@@ -489,6 +489,7 @@ function updateSliders(state) {
   for (let name in slider_vals) {
     let vals = slider_vals[name];
     let label = vals.label;
+    let tooltip = vals.tooltip;
     let unit = vals.unit;
     let min = parseFloat(vals.min);
     let max = parseFloat(vals.max);
@@ -501,7 +502,8 @@ function updateSliders(state) {
       sliderParams[state][name] = def;
     }
 
-    sliders.append('<br><span>' + label + ': <span id="' + sliderValId + '">' + sliderParams[state][name] + '</span> ' + unit + '</span');
+    //sliders.append('<div class="ttip">Hover over me<span class="ttiptext">Tooltip text</span></div> ');
+    sliders.append('<br><span class="ttip">' + label + ': <span class="ttiptext">' + tooltip + '</span><span id="' + sliderValId + '">' + sliderParams[state][name] + '</span> ' + unit + '</span');
     sliders.append('<input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + sliderParams[state][name] + '"/>');
 
     $('#' + sliderId).slider();
