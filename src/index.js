@@ -222,6 +222,8 @@ function addMapLayers() {
  */
 function runModel() {
   $('#loading-bar').modal('show');
+  $('body').removeClass('colorbg');
+
   if (activeModel == 'plan' && activeLevel == 'nat') {
     runPlanNat();
   } else if (activeModel == 'plan' && activeLevel == 'loc') {
@@ -240,7 +242,11 @@ function runPlanNat() {
   $.ajax({
     url: API + 'plan_nat',
     data: sliderParams['plan-nat'],
-    success: showPlanNat
+    success: showPlanNat,
+    error: function () {
+      $('#loading-bar').modal('hide');
+      $('body').addClass('colorbg');
+    }
   });
 }
 
@@ -253,13 +259,18 @@ function runPlanLoc() {
     $.ajax({
       url: API + 'plan_loc',
       data: sliderParams['plan-loc'],
-      success: showPlanLoc
+      success: showPlanLoc,
+      error: function () {
+        $('#loading-bar').modal('hide');
+        $('body').addClass('colorbg');
+      }
     });
     
   } else {
     $('#map-announce').html('No building data found');
     setTimeout(resetAnnounce, 2000);
     $('#loading-bar').modal('hide');
+    $('body').addClass('colorbg');
   }
 }
 
@@ -271,7 +282,11 @@ function runFindNat() {
   $.ajax({
     url: API + 'find_nat',
     data: sliderParams['find-nat'],
-    success: showFindNat
+    success: showFindNat,
+    error: function () {
+      $('#loading-bar').modal('hide');
+      $('body').addClass('colorbg');
+    }
   });
 }
 
@@ -312,7 +327,9 @@ function showPlanNat(data) {
   ]);
 
   updateSummary('plan-nat', data.summary);
+  map.resize();
   $('#loading-bar').modal('hide');
+  $('body').addClass('colorbg');
 }
 
 /**
@@ -348,7 +365,9 @@ function showPlanLoc(data) {
   }
 
   updateSummary('plan-loc', data.summary); 
+  map.resize();
   $('#loading-bar').modal('hide');
+  $('body').addClass('colorbg');
 }
 
 /**
@@ -364,8 +383,9 @@ function showFindNat(data) {
   });
 
   updateSummary('find-nat', data.summary);
-
+  map.resize();
   $('#loading-bar').modal('hide');
+  $('body').addClass('colorbg');
 }
 
 /**

@@ -19,7 +19,7 @@
 <meta property="og:image:height" content="1280">
 
 </head>
-<body>
+<body class="colorbg">
 
 <!-- Nav Bar -->
 <nav class="navbar navbar-dark navbar-expand-md navbar-dark justify-content-between shad">
@@ -112,7 +112,7 @@
   <div class="row flex-grow-1 hidden" id="explore">
 
     <!-- Left fixed pane for parameter entry -->
-    <div class="col-sm-2 fixed py-3 shad pane">
+    <div class="col py-3 pane">
       <h3 class="ml-3 hidden-sm-down text">Lesotho</h3>
       <button type="button" class="btn btn-primary btn-sm" id="run-model"></button>
       <button type="button" class="btn btn-secondary btn-sm" id="change-country">Change country</button>
@@ -120,13 +120,13 @@
     </div>
 
     <!-- Central flexible pane for map -->
-    <div class="col fluid px-0" id="map"></div>
+    <div class="col-sm-8 px-0" id="map"></div>
     <div class='map-overlay top hidden' id='map-announce-outer'>
       <div class='map-overlay-inner' id='map-announce'></div>
     </div>
 
     <!-- Right fixed pane for summary result display -->
-    <div class="col-sm-2 fixed py-3 shad pane">
+    <div class="col py-3 pane">
       <h3 class="text">Map legend</h3>
       <div id="legend"></div>
       <br>
@@ -134,20 +134,23 @@
       <div id="summary" style="width: 100%;"></div>
     </div>
   </div>
+
+  <!-- Modal loading bar for running model -->
+  <div class="modal" id="loading-bar">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="progress progress-popup">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- Modal loading bar for running model -->
-<div class="modal" id="loading-bar">
- <div class="modal-dialog modal-dialog-centered">
-   <div class="modal-content">
-     <div class="modal-body">
-       <div class="progress progress-popup">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-       </div>
-     </div>
-   </div>
- </div>
-</div>
+
 
 </body>
 </html>
