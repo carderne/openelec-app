@@ -222,7 +222,6 @@ function addMapLayers() {
  */
 function runModel() {
   $('#loading-bar').modal('show');
-  $('body').removeClass('colorbg');
 
   if (activeModel == 'plan' && activeLevel == 'nat') {
     runPlanNat();
@@ -245,7 +244,6 @@ function runPlanNat() {
     success: showPlanNat,
     error: function () {
       $('#loading-bar').modal('hide');
-      $('body').addClass('colorbg');
     }
   });
 }
@@ -262,7 +260,6 @@ function runPlanLoc() {
       success: showPlanLoc,
       error: function () {
         $('#loading-bar').modal('hide');
-        $('body').addClass('colorbg');
       }
     });
     
@@ -270,7 +267,6 @@ function runPlanLoc() {
     $('#map-announce').html('No building data found');
     setTimeout(resetAnnounce, 2000);
     $('#loading-bar').modal('hide');
-    $('body').addClass('colorbg');
   }
 }
 
@@ -285,7 +281,6 @@ function runFindNat() {
     success: showFindNat,
     error: function () {
       $('#loading-bar').modal('hide');
-      $('body').addClass('colorbg');
     }
   });
 }
@@ -329,7 +324,6 @@ function showPlanNat(data) {
   updateSummary('plan-nat', data.summary);
   map.resize();
   $('#loading-bar').modal('hide');
-  $('body').addClass('colorbg');
 }
 
 /**
@@ -367,7 +361,6 @@ function showPlanLoc(data) {
   updateSummary('plan-loc', data.summary); 
   map.resize();
   $('#loading-bar').modal('hide');
-  $('body').addClass('colorbg');
 }
 
 /**
@@ -385,7 +378,6 @@ function showFindNat(data) {
   updateSummary('find-nat', data.summary);
   map.resize();
   $('#loading-bar').modal('hide');
-  $('body').addClass('colorbg');
 }
 
 /**
@@ -579,6 +571,7 @@ function createLegend(colors, labels) {
  * Display the main explore screen with map centered.
  */
 function chooseCountry() {
+  $('body').addClass('colorbg');
   if (!layersAdded) {
     addMapLayers();
     layersAdded = true;
@@ -612,6 +605,7 @@ function plan() {
   if (!country) {
     chooseCountry();
   } else {
+    $('body').removeClass('colorbg');
     hide('landing');
     show('explore');
     hide('about');
@@ -626,7 +620,7 @@ function find() {
   activeModel = 'find';
   activeLevel = 'nat';
   activeMode('go-find');
-  $('#run-model').html('Filter');
+  $('#run-model').html('Filter clusters');
   disableClass('run-model', 'disabled');
   updateSliders('find-nat');
 
@@ -642,6 +636,7 @@ function find() {
   if (!country) {
     chooseCountry();
   } else {
+    $('body').removeClass('colorbg');
     hide('landing');
     show('explore');
     hide('about');
@@ -653,6 +648,7 @@ function find() {
  * 
  */
 function explore() {
+  $('body').removeClass('colorbg');
   country = this.id;
   $.ajax({
     url: API + 'get_country',
@@ -686,6 +682,7 @@ function explore() {
  * Display the home page.
  */
 function home() {
+  $('body').addClass('colorbg');
   activeMode();
   show('landing');
   hide('explore');
@@ -698,6 +695,7 @@ function home() {
  * Display the about page.
  */
 function about() {
+  $('body').addClass('colorbg');
   activeMode();
   hide('landing');
   hide('explore');
