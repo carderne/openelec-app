@@ -238,7 +238,7 @@ function runModel() {
  */
 function runPlanNat() {
   sliderParams['plan-nat']['country'] = country;
-  sliderParams['plan-nat']['urban_elec'] = countries[country]['urban_elec'];
+  sliderParams['plan-nat']['access-urban'] = countries[country]['access-urban'];
   $.ajax({
     url: API + 'plan_nat',
     data: sliderParams['plan-nat'],
@@ -441,7 +441,7 @@ function prepPlanLoc() {
   legendHtml['plan-loc'] = createLegend(colors, labels);
 
   $('#summary').html(summaryHtml['plan-loc']);
-  $('#run-model').html('Run model');
+  $('#run-model').html('Model local');
 }
 
 /**
@@ -538,13 +538,15 @@ function updateSummary(state, summaryData) {
   let config = summaryConfigs[state];
   let summary = $('#summary');
 
-  summary.html('');
+  summary.html('<h4 class="text">Summary results</h4>');
+  summary.append('<p>');
   for (let name in config) {
     let vals = config[name];
     let label = vals.label;
     let unit = vals.unit;
-    summary.append('<p>' + label + ': ' + summaryData[name].toFixed(0) + ' ' + unit + '</p>');
+    summary.append(label + ': ' + numberWithCommas(summaryData[name].toFixed(0)) + ' ' + unit + '<br>');
   }
+  summary.append('</p>');
 
   if (state == 'plan-nat') {
     let chartData = [
@@ -564,7 +566,7 @@ function updateSummary(state, summaryData) {
  */
 function createLegend(colors, labels) {
   let legend = $('#legend');
-  legend.html('');
+  legend.html('<h4 class="text">Map legend</h4>');
   for (let row in colors) {
     let label = labels[row];
     let color = colors[row];
@@ -594,7 +596,7 @@ function plan() {
   activeModel = 'plan';
   activeLevel = 'nat';
   activeMode('go-plan');
-  $('#run-model').html('Run model');
+  $('#run-model').html('Model national');
   disableClass('run-model', 'disabled');
   updateSliders('plan-nat');
 
@@ -663,6 +665,10 @@ function explore() {
 
   $('#map-announce').html(clickMsg);
   show('map-announce-outer');
+
+  $('.country-name').html(capFirst(country));
+  $('#country-overview').html('<h4 class="text">Country overview</h4>');
+  $('#country-overview').append('<p>Population: ' + numberWithCommas(countries[country].pop) + '<br>Access rate: ' + countries[country]['access-rate']*100 + ' %');
 
   countryBounds = countries[country].bounds;
   let camera = map.cameraForBounds(countryBounds, {padding: -200});
@@ -791,7 +797,7 @@ function createChart(dataset) {
   // TODO make responsive
   var outerWidth = 250;
   var outerHeight = 200;
-  var margin = { left: 0, top: 30, right: 0, bottom: 50 };
+  var margin = { left: 50, top: 50, right: 0, bottom: 50 };
   var barPadding = 0.2;
 
   var xColumn = 'type';
@@ -812,7 +818,7 @@ function createChart(dataset) {
   var innerHeight = outerHeight - margin.top  - margin.bottom;
 
   
-  $('#summary').append('<h3 class="text">Newly connected population</h3>');
+  $('#summary').append('<h5 class="text">Newly connected population</h5>');
 
   var svg = d3.select('#summary').append('svg')
     .attr('width', '100%')
@@ -857,4 +863,8 @@ function createChart(dataset) {
     .attr('height', function (d){ return innerHeight - yScale(d[yColumn]); })
     .attr('fill', function (d){ return colorPicker(d[colorColumn]); });
   bars.exit().remove();
+}
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }

@@ -10,7 +10,7 @@ export const sliderConfigs = {
       'tooltip': 'Consider clusters within this distance as already connected.'
     },
     'min-ntl': {
-      'default': '50',
+      'default': '20',
       'label': 'Minimum night lights connected',
       'max': '255',
       'min': '0',
@@ -72,15 +72,6 @@ export const sliderConfigs = {
       'unit': 'USD/m2',
       'tooltip': 'Local in-cluster grid distribution cost as a function of village size.'
     },
-    'urban-elec': {
-      'default': '50',
-      'label': 'Urban electrification rate',
-      'max': '100',
-      'min': '0',
-      'step': '5',
-      'unit': '%',
-      'tooltip': 'Current urban electrification rate.'
-    }
   },
   'plan-loc': {
     'min-area': {
@@ -269,9 +260,17 @@ export const countries = {
   'lesotho': {
     // bounds are [W, S], [E, N]
     'bounds': [[27.0344, -30.3513], [29.1263, -28.5838]],
+    'pop': 2233000,
+    'access-rate': 0.297,
+    'access-urban': 0.66,
+    'access-rural': 0.157
   },
   'rwanda': {
     'bounds': [[28.329516540, -2.884785794], [31.431263800, -1.002637116]],
+    'pop': 12210000,
+    'access-rate': 0.294,
+    'access-urban': 0.8,
+    'access-rural': 0.178
   }
 };
 
