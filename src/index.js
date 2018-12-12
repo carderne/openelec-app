@@ -433,7 +433,7 @@ function prepPlanLoc() {
   legendHtml['plan-loc'] = createLegend(colors, labels);
 
   $('#summary').html(summaryHtml['plan-loc']);
-  $('#run-model').html('Model local');
+  $('#run-model').html('Run model');
 }
 
 /**
@@ -534,9 +534,21 @@ function updateSummary(state, summaryData) {
   summary.append('<p>');
   for (let name in config) {
     let vals = config[name];
+    let value = summaryData[name];
     let label = vals.label;
     let unit = vals.unit;
-    summary.append(label + ': ' + numberWithCommas(summaryData[name].toFixed(0)) + ' ' + unit + '<br>');
+
+    if (value > 1e9) {
+      value = (value / 1e9).toFixed(2);
+      unit = 'billion ' + unit;
+    } else if (value > 1e6) {
+      value = (value / 1e6).toFixed(2);
+      unit = 'million ' + unit;
+    } else {
+      value = value.toFixed(0);
+    }
+    
+    summary.append(label + ': ' + numberWithCommas(value) + ' ' + unit + '<br>');
   }
   summary.append('</p>');
 
@@ -589,7 +601,7 @@ function plan() {
   activeModel = 'plan';
   activeLevel = 'nat';
   activeMode('go-plan');
-  $('#run-model').html('Model national');
+  $('#run-model').html('Run model');
   disableClass('run-model', 'disabled');
   updateSliders('plan-nat');
 
@@ -620,7 +632,7 @@ function find() {
   activeModel = 'find';
   activeLevel = 'nat';
   activeMode('go-find');
-  $('#run-model').html('Filter clusters');
+  $('#run-model').html('Run model');
   disableClass('run-model', 'disabled');
   updateSliders('find-nat');
 
@@ -664,7 +676,8 @@ function explore() {
 
   $('.country-name').html(capFirst(country));
   $('#country-overview').html('<h4 class="text">Country overview</h4>');
-  $('#country-overview').append('<p>Population: ' + numberWithCommas(countries[country].pop) + '<br>Access rate: ' + countries[country]['access-rate']*100 + ' %');
+  let population = (countries[country].pop / 1e6).toFixed(2);
+  $('#country-overview').append('<p>Population: ' + numberWithCommas(population) + ' million<br>Access rate: ' + countries[country]['access-rate']*100 + ' %');
 
   countryBounds = countries[country].bounds;
   let camera = map.cameraForBounds(countryBounds, {padding: -200});
@@ -793,9 +806,9 @@ function capFirst(string) {
  */
 function createChart(dataset) {
   // TODO make responsive
-  var outerWidth = 250;
+  var outerWidth = 200;
   var outerHeight = 200;
-  var margin = { left: 50, top: 50, right: 0, bottom: 50 };
+  var margin = { left: 50, top: 20, right: 0, bottom: 50 };
   var barPadding = 0.2;
 
   var xColumn = 'type';
@@ -814,9 +827,8 @@ function createChart(dataset) {
 
   var innerWidth  = outerWidth  - margin.left - margin.right;
   var innerHeight = outerHeight - margin.top  - margin.bottom;
-
   
-  $('#summary').append('<h5 class="text">Newly connected population</h5>');
+  $('#summary').append('<hp class="text font-weight-bold">Newly connected population</hp>');
 
   var svg = d3.select('#summary').append('svg')
     .attr('width', '100%')
@@ -845,12 +857,15 @@ function createChart(dataset) {
 
   xAxisG
     .call(xAxis)
-    .selectAll('text')  
+    .selectAll('text')
+    .style('font-size', '14px')
     .attr('dx', '-0.4em')
-    .attr('dy', '1.24em')
+    .attr('dy', '0.8em')
     .attr('transform', 'rotate(-16)' );
 
-  yAxisG.call(yAxis);
+  yAxisG
+    .call(yAxis)
+    .style('font-size', '14px');
 
   var bars = g.selectAll('rect').data(dataset);
   bars.enter().append('rect')

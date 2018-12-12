@@ -206,7 +206,7 @@ export const summaryConfigs = {
       'unit': ''
     },
     'orig-conn-pop': {
-      'label': 'Already connected pop',
+      'label': 'Existing grid pop',
       'unit': ''
     },
     'new-conn-pop': {
