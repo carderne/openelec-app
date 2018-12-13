@@ -23,10 +23,12 @@ import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.
 
 import * as d3 from 'd3';
 
+// eslint-disable-next-line no-undef
 const flags = importImages(require.context('./flags', false, /\.(png|jpe?g|svg)$/));
 
 // Use local API URL for dev, and server for prod
 let API;
+// eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === 'prod') {
   API = 'https://openelec.rdrn.me/api/v1/';
 } else {
@@ -39,8 +41,8 @@ let map;
 // can be one of ['plan', 'find'] 
 let activeModel;
 
-// can be one of ['nat', 'loc']
-let activeLevel;
+// boolean
+let zoomed;
 
 // keep track of the country we're looking at
 let country;
@@ -63,6 +65,25 @@ let layersAdded = false;
 
 // to intialise buildings layer before we have the GeoJSON
 const emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
+
+// standard styling for clusters
+const clusterStylingPlan = [
+  'match',
+  ['get', 'type'],
+  'orig', layerColors.clustersPlan.orig,
+  'new', layerColors.clustersPlan.new,
+  'og', layerColors.clustersPlan.og,
+  layerColors.clustersPlan.default
+];
+
+// find styling for clusters
+const clusterStylingFind = {
+  property: 'score',
+  stops: [
+    [0, layerColors.clustersFind.bottom],
+    [1, layerColors.clustersFind.top]]
+};
+
 
 // Call init() function on DOM load
 $(document).ready(init);
@@ -126,14 +147,7 @@ function addMapLayers() {
     'type': 'fill',
     'source': 'clusters',
     'paint': {
-      'fill-color': [
-        'match',
-        ['get', 'type'],
-        'orig', layerColors.clustersPlan.orig,
-        'new', layerColors.clustersPlan.new,
-        'og', layerColors.clustersPlan.og,
-        layerColors.clustersPlan.default
-      ],
+      'fill-color': clusterStylingPlan,
       'fill-opacity': 0.5,
     }
   });
@@ -142,14 +156,7 @@ function addMapLayers() {
     'type': 'line',
     'source': 'clusters',
     'paint': {
-      'line-color': [
-        'match',
-        ['get', 'type'],
-        'orig', layerColors.clustersPlan.orig,
-        'new', layerColors.clustersPlan.new,
-        'og', layerColors.clustersPlan.og,
-        layerColors.clustersPlan.default
-      ],
+      'line-color': clusterStylingPlan,
       'line-width': 2,
     }
   });
@@ -195,11 +202,11 @@ function addMapLayers() {
     let id = props.fid;
     let pop = props.pop.toFixed(0);
     let area = (props.area/1e6).toFixed(2);
-    let ntl = props.ntl;
-    let gdp = props.gdp;
-    let grid = (props['grid_dist']/1e3).toFixed(2);
-    let travel = (props.travel/60).toFixed(0);
-    let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + '<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + ' hrs</p>';
+    let ntl = props.ntl.toFixed(2);
+    let gdp = props.gdp.toFixed(2);
+    let grid = props['grid_dist'].toFixed(2);
+    let travel = props.travel.toFixed(0);
+    let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + ' USD/p<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + ' hrs</p>';
 
     popup.setLngLat([e.lngLat.lng, e.lngLat.lat])
       .setHTML(text)
@@ -223,10 +230,10 @@ function addMapLayers() {
 function runModel() {
   $('#loading-bar').modal('show');
 
-  if (activeModel == 'plan' && activeLevel == 'nat') {
-    runPlanNat();
-  } else if (activeModel == 'plan' && activeLevel == 'loc') {
+  if (zoomed) {
     runPlanLoc();
+  } else if (activeModel == 'plan') {
+    runPlanNat();
   } else if (activeModel == 'find') {
     runFindNat();
   }
@@ -253,7 +260,6 @@ function runPlanNat() {
  */
 function runPlanLoc() {
   if (sliderParams['plan-loc']['village']) {
-
     $.ajax({
       url: API + 'plan_loc',
       data: sliderParams['plan-loc'],
@@ -262,7 +268,6 @@ function runPlanLoc() {
         $('#loading-bar').modal('hide');
       }
     });
-    
   } else {
     $('#map-announce').html('No building data found');
     setTimeout(resetAnnounce, 2000);
@@ -311,15 +316,7 @@ function showPlanNat(data) {
   }
 
   map.getSource('clusters').setData(data.clusters);
-
-  map.setPaintProperty('clusters', 'fill-color', [
-    'match',
-    ['get', 'type'],
-    'orig', layerColors.clustersPlan.orig,
-    'new', layerColors.clustersPlan.new,
-    'og', layerColors.clustersPlan.og,
-    layerColors.clustersPlan.default
-  ]);
+  map.setPaintProperty('clusters', 'fill-color', clusterStylingPlan);
 
   updateSummary('plan-nat', data.summary);
   map.resize();
@@ -370,10 +367,8 @@ function showPlanLoc(data) {
  */
 function showFindNat(data) {
   map.getSource('clusters').setData(data.clusters);
-  map.setPaintProperty('clusters', 'fill-color', {
-    property: 'score',
-    stops: [[1, layerColors.clustersFind.bottom], [5, layerColors.clustersFind.top]]
-  });
+  map.setPaintProperty('clusters', 'fill-color', clusterStylingFind);
+  map.setPaintProperty('clusters-outline', 'line-color', clusterStylingFind);
 
   updateSummary('find-nat', data.summary);
   map.resize();
@@ -401,8 +396,7 @@ function prepPlanLoc() {
 
   $('#map-announce').html(clickBtn);
   $('#btn-zoom-out').click(zoomToNat);
-  activeModel = 'plan';
-  activeLevel = 'loc';
+  zoomed = true;
 
   let overpassApiUrl = buildOverpassApiUrl('building', clusterBounds);
   $.get(overpassApiUrl, function (osmDataAsJson) {
@@ -473,7 +467,6 @@ function zoomToNat() {
   $('#map-announce').html(clickMsg);
 
   let state = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
-
   updateSliders(state);
   $('#legend').html(legendHtml[state]);
   $('#summary').html(summaryHtml[state]);
@@ -494,30 +487,91 @@ function updateSliders(state) {
   sliders.html('');
   for (let name in slider_vals) {
     let vals = slider_vals[name];
+    let type = vals.type;
+    let def = vals.default;
     let label = vals.label;
     let tooltip = vals.tooltip;
     let unit = vals.unit;
     let min = parseFloat(vals.min);
     let max = parseFloat(vals.max);
     let step = parseFloat(vals.step);
-    let def = parseFloat(vals.default);
-
+    
     let sliderId = 'sl-' + name;
     let sliderValId = 'sl-' + name + '-val';
     if (!sliderParams[state][name]) {
       sliderParams[state][name] = def;
     }
 
-    //sliders.append('<div class="ttip">Hover over me<span class="ttiptext">Tooltip text</span></div> ');
-    sliders.append('<br><span class="ttip">' + label + ': <span class="ttiptext">' + tooltip + '</span><span id="' + sliderValId + '">' + sliderParams[state][name] + '</span> ' + unit + '</span');
+    let defText;
+    if (type == 'range') {
+      let defVals = JSON.parse(sliderParams[state][name]);
+      defText = defVals[0] + ' - ∞';
+    } else {
+      defText = sliderParams[state][name];
+    }
+
+    sliders.append('<br><span class="ttip">' + label + ': <span class="ttiptext">' + tooltip + '</span><span id="' + sliderValId + '">' + defText + '</span> ' + unit + '</span');
     sliders.append('<input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + sliderParams[state][name] + '"/>');
 
     $('#' + sliderId).slider();
     $('#' + sliderId).on('slide', function(slideEvt) {
-      $('#' + sliderValId).text(slideEvt.value);
-      sliderParams[state][name] = parseFloat($('#' + sliderId).val());
+      let textVal;
+      let sliderVal;
+      if (type == 'range') {
+        let from = slideEvt.value[0];
+        let to = slideEvt.value[1];
+        let toVal = to;
+
+        if (to == max) {
+          to = '∞';
+          toVal = 1e19;
+        }
+
+        textVal = from + ' - ' + to;
+        sliderVal = '[' + from + ',' + toVal + ']';
+      } else {
+        textVal = slideEvt.value;
+        sliderVal = $('#' + sliderId).val();
+      }
+      $('#' + sliderValId).text(textVal);
+      sliderParams[state][name] = sliderVal;
+
+      if (state == 'find-nat') {
+        //update map display based on sliders!
+        hideClusters();
+      }
     });
   }
+}
+
+/**
+ * 
+ */
+function hideClusters() {
+  let params = sliderParams['find-nat'];
+
+  let pop = JSON.parse(params['pop-range']);
+  let grid = JSON.parse(params['grid-range']);
+  let ntl = JSON.parse(params['ntl-range']);
+  let gdp = JSON.parse(params['gdp-range']);
+  let travel = JSON.parse(params['travel-range']);
+
+  let hiddenFilters = [
+    'all',
+    ['>=', 'pop', pop[0]],
+    ['<=', 'pop', pop[1]],
+    ['>=', 'grid_dist', grid[0]],
+    ['<=', 'grid_dist', grid[1]],
+    ['>=', 'ntl', ntl[0]],
+    ['<=', 'ntl', ntl[1]],
+    ['>=', 'gdp', gdp[0]],
+    ['<=', 'gdp', gdp[1]],
+    ['>=', 'travel', travel[0]],
+    ['<=', 'travel', travel[1]]
+  ];
+
+  map.setFilter('clusters', hiddenFilters);
+  map.setFilter('clusters-outline', hiddenFilters);
 }
 
 /**
@@ -599,7 +653,7 @@ function chooseCountry() {
  */
 function plan() {
   activeModel = 'plan';
-  activeLevel = 'nat';
+  zoomed = false;
   activeMode('go-plan');
   $('#run-model').html('Run model');
   disableClass('run-model', 'disabled');
@@ -608,6 +662,13 @@ function plan() {
   $('#summary').html(summaryHtml['plan-nat']);
   if (map.getLayer('network')) {
     map.setLayoutProperty('network', 'visibility', 'visible');
+  }
+
+  if (map.getLayer('clusters')) {
+    map.setPaintProperty('clusters', 'fill-color', clusterStylingPlan);
+    map.setPaintProperty('clusters-outline', 'line-color', clusterStylingPlan);
+    map.setFilter('clusters', null);
+    map.setFilter('clusters-outline', null);
   }
 
   let colors = layerColors.clustersPlan;
@@ -630,7 +691,7 @@ function plan() {
  */
 function find() {
   activeModel = 'find';
-  activeLevel = 'nat';
+  zoomed = false;
   activeMode('go-find');
   $('#run-model').html('Run model');
   disableClass('run-model', 'disabled');
@@ -639,6 +700,13 @@ function find() {
   $('#summary').html(summaryHtml['find-nat']);
   if (map.getLayer('network')) {
     map.setLayoutProperty('network', 'visibility', 'none');
+  }
+
+  if (map.getLayer('clusters')) {
+    map.setPaintProperty('clusters', 'fill-color', clusterStylingFind);
+    map.setPaintProperty('clusters-outline', 'line-color', clusterStylingFind);
+  
+    hideClusters();
   }
 
   let colors = layerColors.clustersFind;

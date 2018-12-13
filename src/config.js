@@ -1,6 +1,7 @@
 export const sliderConfigs = {
   'plan-nat': {
     'grid-dist': {
+      'type': 'single',
       'default': '1',
       'label': 'Grid dist connected',
       'max': '5',
@@ -10,15 +11,17 @@ export const sliderConfigs = {
       'tooltip': 'Consider clusters within this distance as already connected.'
     },
     'min-ntl': {
-      'default': '20',
+      'type': 'single',
+      'default': '0.2',
       'label': 'Minimum night lights connected',
-      'max': '255',
+      'max': '1',
       'min': '0',
-      'step': '5',
+      'step': '0.1',
       'unit': '',
       'tooltip': 'Minimum night lights value to consider a cluster already connected.'
     },
     'min-pop': {
+      'type': 'single',
       'default': '100',
       'label': 'Minimum population',
       'max': '1000',
@@ -28,6 +31,7 @@ export const sliderConfigs = {
       'tooltip': 'Exclude from analysis villages with less that this population.'
     },
     'demand-ppm': {
+      'type': 'single',
       'default': '6',
       'label': 'Demand',
       'max': '100',
@@ -37,6 +41,7 @@ export const sliderConfigs = {
       'tooltip': 'The average electricity demand per person in all clusters.'
     },
     'mg-gen-cost': {
+      'type': 'single',
       'default': '4000',
       'label': 'Minigrid gen cost',
       'max': '10000',
@@ -46,6 +51,7 @@ export const sliderConfigs = {
       'tooltip': 'Installed cost of a minigrid system, excluding distribution.'
     },
     'mg-dist-cost': {
+      'type': 'single',
       'default': '2',
       'label': 'Minigrid dist cost',
       'max': '10',
@@ -55,6 +61,7 @@ export const sliderConfigs = {
       'tooltip': 'Minigrid distribution cost as a function of village size.'
     },
     'grid-mv-cost': {
+      'type': 'single',
       'default': '50',
       'label': 'Grid MV wire cost',
       'max': '200',
@@ -64,6 +71,7 @@ export const sliderConfigs = {
       'tooltip': 'Grid MV lines extension cost.'
     },
     'grid-lv-cost': {
+      'type': 'single',
       'default': '2',
       'label': 'Grid LV wire cost',
       'max': '10',
@@ -75,6 +83,7 @@ export const sliderConfigs = {
   },
   'plan-loc': {
     'min-area': {
+      'type': 'single',
       'default': '30',
       'label': 'Minimum building size',
       'max': '100',
@@ -84,6 +93,7 @@ export const sliderConfigs = {
       'tooltip': 'Exclude from analysis buildings below this size.'
     },
     'demand': {
+      'type': 'single',
       'default': '10',
       'label': 'Demand',
       'max': '100',
@@ -93,6 +103,7 @@ export const sliderConfigs = {
       'tooltip': 'Electricity demand per person.'
     },
     'tariff': {
+      'type': 'single',
       'default': '0.5',
       'label': 'Tariff',
       'max': '1',
@@ -102,6 +113,7 @@ export const sliderConfigs = {
       'tooltip': 'Tariff to be charged to consumers.'
     },
     'gen-cost': {
+      'type': 'single',
       'default': '1000',
       'label': 'Generator cost',
       'max': '10000',
@@ -111,6 +123,7 @@ export const sliderConfigs = {
       'tooltip': 'Installed cost of a minigrid system, excluding distribution.'
     },
     'wire-cost': {
+      'type': 'single',
       'default': '10',
       'label': 'Wire cost',
       'max': '50',
@@ -120,6 +133,7 @@ export const sliderConfigs = {
       'tooltip': 'Cost of local distribution wires.'
     },
     'conn-cost': {
+      'type': 'single',
       'default': '100',
       'label': 'Connection cost',
       'max': '500',
@@ -129,6 +143,7 @@ export const sliderConfigs = {
       'tooltip': 'The connection cost per building.'
     },
     'opex-ratio': {
+      'type': 'single',
       'default': '2',
       'label': 'OPEX ratio',
       'max': '10',
@@ -138,6 +153,7 @@ export const sliderConfigs = {
       'tooltip': 'Annual operating costs as a percentage of CAPEX.'
     },
     'years': {
+      'type': 'single',
       'default': '20',
       'label': 'Project life',
       'max': '30',
@@ -147,6 +163,7 @@ export const sliderConfigs = {
       'tooltip': 'Years over which to amortise project.'
     },
     'discount-rate': {
+      'type': 'single',
       'default': '6',
       'label': 'Discount rate',
       'max': '20',
@@ -157,32 +174,55 @@ export const sliderConfigs = {
     }
   },
   'find-nat': {
-    'min-pop': {
-      'default': '500',
-      'label': 'Minimum population',
-      'max': '2000',
+    'pop-range': {
+      'type': 'range',
+      'default': '[0,1e14]',
+      'label': 'Pop range',
+      'max': '40000',
       'min': '0',
       'step': '100',
       'unit': '',
-      'tooltip': 'Exclude clusters with less than this population.'
+      'tooltip': 'Filter to clusters within this range.'
     },
-    'min-grid-dist': {
-      'default': '10',
-      'label': 'Minimum grid distance',
-      'max': '20',
+    'grid-range': {
+      'type': 'range',
+      'default': '[0,1e14]',
+      'label': 'Grid distance',
+      'max': '80',
       'min': '0',
       'step': '1',
       'unit': 'km',
-      'tooltip': 'Exclude clusters closer than this to the grid.'
+      'tooltip': 'Filter to clusters within this range.'
     },
-    'max-ntl': {
-      'default': '200',
-      'label': 'Maximum night time lights',
-      'max': '255',
-      'min': '150',
-      'step': '5',
+    'ntl-range': {
+      'type': 'range',
+      'default': '[0.0,1e14]',
+      'label': 'Night lights',
+      'max': '40.0',
+      'min': '0.0',
+      'step': '0.1',
       'unit': '',
-      'tooltip': 'Exclude clusters above this level of night lights.'
+      'tooltip': 'Filter to clusters within this range.'
+    },
+    'gdp-range': {
+      'type': 'range',
+      'default': '[0,1e14]',
+      'label': 'Economy',
+      'max': '3000',
+      'min': '0',
+      'step': '100',
+      'unit': 'USD/capita',
+      'tooltip': 'Filter to clusters within this range.'
+    },
+    'travel-range': {
+      'type': 'range',
+      'default': '[0,1e14]',
+      'label': 'Travel time',
+      'max': '40',
+      'min': '0',
+      'step': '1',
+      'unit': 'hours',
+      'tooltip': 'Filter to clusters within this range.'
     },
   }
 };
@@ -277,15 +317,15 @@ export const countries = {
 export const layerColors = {
   'grid': '#474747', // grey
   'clustersPlan': {
-    'default': '#1d0b1c', //grey
+    'default': '#ffc14a', //orange
     'orig': '#377eb8', // blue
     'new': '#4daf4a', // green
     'og': '#e41a1c' // red
   },
   'clustersFind': {
-    'default': '#1d0b1c', //grey
-    'top': '#9ebcda', // light blue
-    'bottom': '#6e016b' // purple
+    'default': '#ffc14a', //orange
+    'top': '#49006a', // dark purplpe
+    'bottom': '#fcc5c0' // light purple
   },
   'network': '#339900', // green
   'buildings': {

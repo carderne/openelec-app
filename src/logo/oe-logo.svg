@@ -16,9 +16,9 @@
    id="svg864"
    sodipodi:docname="oe-logo.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   inkscape:export-filename="/home/chris/Downloads/oe-logo.png"
-   inkscape:export-xdpi="203.1998"
-   inkscape:export-ydpi="203.1998">
+   inkscape:export-filename="/home/chris/Documents/Code/openelec_front/src/icons/favicon-1024.png"
+   inkscape:export-xdpi="520.19147"
+   inkscape:export-ydpi="520.19147">
   <defs
      id="defs858" />
   <sodipodi:namedview
@@ -29,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5603195"
-     inkscape:cx="-52.512579"
+     inkscape:cx="-8.0363502"
      inkscape:cy="142.6191"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -52,7 +52,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
