@@ -11,6 +11,11 @@ body, html {
     /* background by SVGBackgrounds.com */
 }
 
+.navbar-logo {
+    width: 80px;
+    padding-top: 10px;
+}
+
 body {
 	display: flex;
     flex-direction: column;
