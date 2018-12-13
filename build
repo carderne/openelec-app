@@ -1,6 +1,7 @@
 npm run build
 
 cp src/icons/favicon-1024.png dist
+cp src/logo/oobica.png dist
 echo https://openelec.surge.sh > dist/CNAME
 
 surge dist
