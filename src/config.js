@@ -330,8 +330,8 @@ export const layerColors = {
   'network': '#339900', // green
   'buildings': {
     'default': '#005824', // dark green
-    'bottom': '#ccece6', // light
-    'top': '#005824' // dark green
+    'mg': '#43bcc6', // blue
+    'shs': '#f97fac' // pink
   },
   'lv': '#4f5283' // grey
 };

@@ -187,31 +187,9 @@ function addMapLayers() {
     }
   });
 
-  // Create a popup, but don't add it to the map yet.
-  let popup = new mapboxgl.Popup({
-    closeButton: false,
-    closeOnClick: false
-  });
-
   // Change the cursor to a pointer when the mouse is over the states layer.
   // And show hover popup
-  map.on('mouseenter', 'clusters', function (e) {
-    map.getCanvas().style.cursor = 'pointer';
-
-    let props = e.features[0].properties;
-    let id = props.fid;
-    let pop = props.pop.toFixed(0);
-    let area = (props.area/1e6).toFixed(2);
-    let ntl = props.ntl.toFixed(2);
-    let gdp = props.gdp.toFixed(2);
-    let grid = props['grid_dist'].toFixed(2);
-    let travel = props.travel.toFixed(0);
-    let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + ' USD/p<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + ' hrs</p>';
-
-    popup.setLngLat([e.lngLat.lng, e.lngLat.lat])
-      .setHTML(text)
-      .addTo(map);
-  });
+  map.on('mouseenter', 'clusters', mouseOverClusters);
 
   // Change it back to a pointer when it leaves.
   // And remove popup
@@ -221,6 +199,34 @@ function addMapLayers() {
   });
 
   map.on('click', 'clusters', clusterClick);
+}
+
+// Create a popup, but don't add it to the map yet.
+let popup = new mapboxgl.Popup({
+  closeButton: false,
+  closeOnClick: false
+});
+
+/**
+ * 
+ * @param {*} e 
+ */
+function mouseOverClusters(e) {
+  map.getCanvas().style.cursor = 'pointer';
+
+  let props = e.features[0].properties;
+  let id = props.fid;
+  let pop = props.pop.toFixed(0);
+  let area = (props.area/1e6).toFixed(2);
+  let ntl = props.ntl.toFixed(2);
+  let gdp = props.gdp.toFixed(2);
+  let grid = props['grid_dist'].toFixed(2);
+  let travel = props.travel.toFixed(0);
+  let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + ' USD/p<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + ' hrs</p>';
+
+  popup.setLngLat([e.lngLat.lng, e.lngLat.lat])
+    .setHTML(text)
+    .addTo(map);
 }
 
 /**
@@ -332,8 +338,8 @@ function showPlanNat(data) {
 function showPlanLoc(data) {
   map.getSource('buildings').setData(data.buildings);
   map.setPaintProperty('buildings', 'fill-color', {
-    property: 'area',
-    stops: [[1, layerColors.buildings.bottom], [100, layerColors.buildings.top]]
+    property: 'conn',
+    stops: [[0, layerColors.buildings.shs], [1, layerColors.buildings.mg]]
   });
 
   if (map.getSource('lv')) {
@@ -396,6 +402,9 @@ function prepPlanLoc() {
 
   $('#map-announce').html(clickBtn);
   $('#btn-zoom-out').click(zoomToNat);
+  map.on('mouseenter', 'clusters', function (e) {
+    popup.remove();
+  });
   zoomed = true;
 
   let overpassApiUrl = buildOverpassApiUrl('building', clusterBounds);
@@ -423,7 +432,7 @@ function prepPlanLoc() {
   updateSliders('plan-loc');
 
   let colors = layerColors.buildings;
-  let labels = {'default': 'Un-modelled', 'bottom': 'Small', 'top': 'Large'};
+  let labels = {'default': 'Un-modelled', 'mg': 'Mini-grid', 'shs': 'SHS'};
   legendHtml['plan-loc'] = createLegend(colors, labels);
 
   $('#summary').html(summaryHtml['plan-loc']);
@@ -460,6 +469,7 @@ function zoomToNat() {
   countryBounds = countries[country].bounds;
   let camera = map.cameraForBounds(countryBounds, {padding: -200});
   map.flyTo(camera);
+  map.on('mouseenter', 'clusters', mouseOverClusters);
 
   map.setPaintProperty('clusters', 'fill-opacity', 0.5);
 
