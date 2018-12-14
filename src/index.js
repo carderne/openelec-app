@@ -220,7 +220,7 @@ function mouseOverClusters(e) {
   let area = (props.area/1e6).toFixed(2);
   let ntl = props.ntl.toFixed(2);
   let gdp = props.gdp.toFixed(2);
-  let grid = props['grid_dist'].toFixed(2);
+  let grid = props.grid.toFixed(2);
   let travel = props.travel.toFixed(0);
   let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + ' USD/p<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + ' hrs</p>';
 
@@ -570,8 +570,8 @@ function hideClusters() {
     'all',
     ['>=', 'pop', pop[0]],
     ['<=', 'pop', pop[1]],
-    ['>=', 'grid_dist', grid[0]],
-    ['<=', 'grid_dist', grid[1]],
+    ['>=', 'grid', grid[0]],
+    ['<=', 'grid', grid[1]],
     ['>=', 'ntl', ntl[0]],
     ['<=', 'ntl', ntl[1]],
     ['>=', 'gdp', gdp[0]],
