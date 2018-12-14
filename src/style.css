@@ -1,3 +1,4 @@
+/* General styling */
 body, html {
     height: 100%;
     font-family: 'Chivo', sans-serif;
@@ -11,11 +12,6 @@ body, html {
     /* background by SVGBackgrounds.com */
 }
 
-.navbar-logo {
-    width: 80px;
-    padding-top: 10px;
-}
-
 body {
 	display: flex;
     flex-direction: column;
@@ -27,12 +23,13 @@ body {
 	padding-right: 1px;
 }
 
-div.hidden {
-	display: none;
-}
-
 nav {
 	background-color: #015249;
+}
+
+.navbar-logo {
+    width: 80px;
+    padding-top: 10px;
 }
 
 .jumbotron {
@@ -48,6 +45,7 @@ nav {
 	background: #BABABA;
 }
 
+/* For modal progress bar */
 .progress {
 	height: 50px;
 }
@@ -56,16 +54,73 @@ nav {
 	width: 100%;
 }
 
-.map-overlay {
-    position: absolute;
-    width: 220px;
-    top: 100px;
-    left: 50%;
-	padding: 10px;
-	margin-left: -110px; /* half of width */
+body.modal-open {
+    padding-right: 0px !important; /* Fix weird behaviour with padding and modal */
 }
 
-.map-overlay .map-overlay-inner {
+/* Class to hide divs */
+div.hidden {
+	display: none;
+}
+
+/* Toggle menu to choose base map */
+#baseToggle {
+    background: #fff;
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    right: 10px;
+    border-radius: 3px;
+    width: 120px;
+    border: 1px solid rgba(0,0,0,0.4);
+    font-family: 'Open Sans', sans-serif;
+}
+
+#baseToggle a {
+    font-size: 13px;
+    color: #404040;
+    display: block;
+    margin: 0;
+    padding: 0;
+    padding: 10px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+#baseToggle a:last-child {
+    border: none;
+}
+
+.btn-primary {
+    background-color: #3887be;
+    border-color: #3887be;
+}
+
+#baseToggle a:hover {
+    background-color: #f8f8f8;
+    color: #404040;
+}
+
+#baseToggle a.active {
+    background-color: #3887be;
+    color: #ffffff;
+}
+
+#baseToggle a.active:hover {
+    background: #3074a4;
+}
+
+/* Map overlay message about clicking clusters etc */
+#map-announce {
+    z-index: 1;
+    font-family: 'Open Sans', sans-serif;
+    position: absolute;
+    width: 120px;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    
     background-color: #fff;
     box-shadow:0 1px 2px rgba(0, 0, 0, 0.10);
     border-radius: 3px;
@@ -73,6 +128,7 @@ nav {
     margin-bottom: 10px;
 }
 
+/* Legend symbols */
 .legend-square {
     display: inline-block;
     border-radius: 20%;
@@ -89,6 +145,7 @@ nav {
     margin-right: 5px;
 }
 
+/* Parameter tooltips */
 .ttip {
     position: relative;
     display: inline-block;
@@ -112,7 +169,3 @@ nav {
 .ttip:hover .ttiptext {
     visibility: visible;
 }
-
-body.modal-open {
-    padding-right: 0px !important;
-  }

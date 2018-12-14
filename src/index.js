@@ -38,6 +38,9 @@ if (process.env.NODE_ENV === 'prod') {
 // object for Mapbox GL map
 let map;
 
+// name of satellite layer to hide
+let satelliteLayer = 'mapbox-satellite';
+
 // can be one of ['plan', 'find'] 
 let activeModel;
 
@@ -96,7 +99,6 @@ $(document).ready(init);
 function init() {
   createMap();
 
-  //$('.favicon').attr('href', images['favicon.ico']);
   $('#go-home').click(home);
   $('#go-about').click(about);
   $('#run-model').click(runModel);
@@ -124,10 +126,10 @@ function init() {
  * Create the Mapbox GL map.
  */
 function createMap() {
-  mapboxgl.accessToken = 'pk.eyJ1IjoiY2FyZGVybmUiLCJhIjoiY2puZnE3YXkxMDBrZTNrczI3cXN2OXQzNiJ9.2BDgu40zHwh3CAfHs6reAQ';
+  mapboxgl.accessToken = 'pk.eyJ1IjoiY2FyZGVybmUiLCJhIjoiY2puMXN5cnBtNG53NDN2bnhlZ3h4b3RqcCJ9.eNjrtezXwvM7Ho1VSxo06w';
   map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v9',
+    style: 'mapbox://styles/carderne/cjpnxmz1e0o7s2suj6vs2thza'
   });
 
   map.addControl(new mapboxgl.ScaleControl({
@@ -141,6 +143,9 @@ function createMap() {
  * Add national layers (grid and clusters) for the country.
  */
 function addMapLayers() {
+  map.setLayoutProperty(satelliteLayer, 'visibility', 'none');
+  createLayerSwitcher();
+
   map.addSource('clusters', { type: 'geojson', data: emptyGeoJSON });
   map.addLayer({
     'id': 'clusters',
@@ -750,7 +755,6 @@ function explore() {
   });
 
   $('#map-announce').html(clickMsg);
-  show('map-announce-outer');
 
   $('.country-name').html(capFirst(country));
   $('#country-overview').html('<h4 class="text">Country overview</h4>');
@@ -779,7 +783,6 @@ function home() {
   hide('explore');
   hide('about');
   hide('countries');
-  hide('map-announce-outer');
 }
 
 /**
@@ -792,7 +795,6 @@ function about() {
   hide('explore');
   show('about');
   hide('countries');
-  hide('map-announce-outer');
 }
 
 /**
@@ -958,4 +960,49 @@ function createChart(dataset) {
 
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+/**
+ * 
+ */
+function createLayerSwitcher() {
+  let toggleableLayerIds = [
+    {
+      'id': 'streets',
+      'name': 'Standard'
+    },
+    {
+      'id': 'satellite',
+      'name': 'Satellite'
+    }
+  ];
+
+  for (let row in toggleableLayerIds) {
+    let id = toggleableLayerIds[row].id
+    let name = toggleableLayerIds[row].name
+
+    let link = document.createElement('a');
+    link.href = '#';
+    if (id == 'streets') {
+      link.className = 'active';
+    }
+    link.id = id;
+    link.textContent = name;
+
+    link.onclick = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      let clickedId = e.target.id;
+      let otherId = clickedId == 'streets' ? 'satellite' : 'streets';
+      let visibility = clickedId == 'streets' ? 'none' : 'visible';
+
+      map.setLayoutProperty(satelliteLayer, 'visibility', visibility);
+      document.getElementById(clickedId).className = 'active';
+      document.getElementById(otherId).className = '';
+    };
+
+    var layers = document.getElementById('baseToggle');
+    layers.appendChild(link);
+  }
 }
