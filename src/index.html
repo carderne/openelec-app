@@ -67,47 +67,63 @@
 
   <!-- Landing page -->
   <div class="row flex-grow-1" id="landing">
-    <div class="jumbotron">
-      <h1 class="display-1" style="display:inline">openelec</h1> BETA
-      <br>
-      <p class="lead">
-        Find opportunities and optimise pathways for universal electricity access.
-        Combine high-resolution satellite and OpenStreetMap data with advanced optimisation strategies
-        to find the best technologies and investments down to household level.
-      </p>
-      <hr class="my-4">
-      <h3>Choose below to start exploring!</h3>
-      <p class="lead">
-        <button type="button" class="btn btn-primary btn-lg" id="go-plan-big">Plan pathways</button>
-        <button type="button" class="btn btn-primary btn-lg" id="go-find-big">Find opportunities</button>
-      </p>
+      <div class="col fluid px-5 py-3">
+        <div class="text-width">
+          <h1 class="display-1" style="display:inline">openelec</h1> BETA
+          <br>
+          <p class="lead">
+            Find opportunities and optimise pathways for universal electricity access.
+            Combine high-resolution satellite and OpenStreetMap data with advanced optimisation strategies
+            to find the best technologies and investments down to household level.
+          </p>
+          <hr class="my-4">
+          <h3>Choose below to start exploring!</h3>
+          <p class="lead">
+            <button type="button" class="btn btn-primary btn-lg" id="go-plan-big">Plan pathways</button>
+            <button type="button" class="btn btn-primary btn-lg" id="go-find-big">Find opportunities</button>
+          </p>
+        </div>
     </div>
   </div>
 
   <!-- Choose country page -->
   <div class="row flex-grow-1 hidden" id="countries">
-    <div class="col fluid px-10">
-      <h1>Choose a country</h1>
+    <div class="col fluid px-5 py-3">
+      <br>
+      <h1 class="display-4">Choose a country</h1>
       <div class="card-deck"id="country-list"></div>
     </div>
   </div>
 
   <!-- About page -->
   <div class="row flex-grow-1 hidden" id="about">
-    <div class="jumbotron">
-        <h1 class="display-4">About openelec</h1>
+      <div class="col fluid px-5 py-3">
+        <div class="text-width">
+          <h1 class="display-4">About openelec</h1>
           <p class="lead">
-            This is a frontend to showcase some of the functionality of the open source tool openelec,
+            A frontend to showcase some of the functionality of the open source tool openelec,
             available <a href="https://github.com/carderne/openelec">here</a>. Please get in
             touch on my GitHub page.
           </p>
           <p class="lead">
-            This was developed following my experiences with electrixity access planning tools, which
+            I developed this following my experiences with electrixity access planning tools, which
             are largely proprietary, expensive and bad. At the same time, there aren't many available
             tools for finding off-grid electricity access options that take advantage of all the data
             available and allow modelling freedom in choosing sites.
           </p>
+          <p class="lead">
+            There are two primary modes in the tool: planning and finding. The first is aimed at public planners,
+            and uses input variables to determine the overall least-cost electrification option for the country.
+            The second is aimed at private developers, and uses a simple filter and priority 'score' to find good
+            opportunities for off-grid electrification.
+          </p>
+          <p class="lead">
+            In addition to this, either mode allows the user to click on any settlement ('cluster') to zoom in to
+            a local view, where building data is extracted from OpenStreetMap for a local analysis. This finds 
+            the optimum local network for a mini-grid development, based on input parameters.
+          </p>
           <p>© Chris Arderne</p>
+        </div>
       </div>
   </div>
 
@@ -150,8 +166,6 @@
   </div>
 
 </div>
-
-
 
 </body>
 </html>

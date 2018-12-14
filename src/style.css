@@ -32,9 +32,9 @@ nav {
     padding-top: 10px;
 }
 
-.jumbotron {
-    background-color: transparent;
-    width: 50%;
+.text-width {
+    word-wrap: break-word;
+    width: 60%;
 }
 
 .pane {
