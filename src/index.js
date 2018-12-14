@@ -104,6 +104,7 @@ function init() {
   $('#go-home').click(home);
   $('#go-about').click(about);
   $('#run-model').click(runModel);
+  $('#download-results').click(downloadResults);
   $('#go-plan').click(plan);
   $('#go-plan-big').click(plan);
   $('#go-find').click(find);
@@ -409,7 +410,8 @@ function prepPlanLoc() {
 
   $('#map-announce').html(clickBtn);
   $('#btn-zoom-out').click(zoomToNat);
-  map.on('mouseenter', 'clusters', function (e) {
+  $('#download-results').html('Download buildings');
+  map.on('mouseenter', 'clusters', function () {
     popup.remove();
   });
   zoomed = true;
@@ -482,6 +484,7 @@ function zoomToNat() {
 
   disableClass('run-model', 'disabled');
   $('#map-announce').html(clickMsg);
+  $('#download-results').html('Download clusters');
 
   let state = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
   updateSliders(state);
@@ -978,8 +981,8 @@ function createLayerSwitcher() {
   ];
 
   for (let row in toggleableLayerIds) {
-    let id = toggleableLayerIds[row].id
-    let name = toggleableLayerIds[row].name
+    let id = toggleableLayerIds[row].id;
+    let name = toggleableLayerIds[row].name;
 
     let link = document.createElement('a');
     link.href = '#';
@@ -1005,4 +1008,22 @@ function createLayerSwitcher() {
     var layers = document.getElementById('baseToggle');
     layers.appendChild(link);
   }
+}
+
+function downloadResults() {
+  let target;
+  let name;
+  if (zoomed) { // download buildings
+    target = map.getSource('buildings');
+    name = 'buildings.geojson';
+  } else { // download clusters
+    target = map.getSource('clusters');
+    name = 'clusters.geojson';
+  }
+
+  let download = document.getElementById('hiddenDownload');
+  download.href = 'data:text/geojson;charset=utf-8,' + encodeURI(JSON.stringify(target._data));
+  download.target = '_blank';
+  download.download = name;
+  download.click();
 }
