@@ -749,12 +749,16 @@ function find() {
 function explore() {
   $('body').removeClass('colorbg');
   country = this.id;
+
   $.ajax({
     url: API + 'get_country',
     data: { 'country': country },
     success: function(data) {
       map.getSource('grid').setData(data.grid);
       map.getSource('clusters').setData(data.clusters);
+    },
+    error: function() {
+      show('server-offline');
     }
   });
 

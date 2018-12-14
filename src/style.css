@@ -128,6 +128,24 @@ div.hidden {
     margin-bottom: 10px;
 }
 
+/* Message appears when the server is offline */
+#server-offline {
+    z-index: 1;
+    font-family: 'Open Sans', sans-serif;
+    position: absolute;
+    width: 200px;
+    top: 10px;
+    left: 50%;
+    padding: 10px;
+    margin-left: -100px; /* half width */
+    
+    background-color: #fff;
+    box-shadow:0 1px 2px rgba(0, 0, 0, 0.10);
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
 /* Legend symbols */
 .legend-square {
     display: inline-block;
