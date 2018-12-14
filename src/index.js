@@ -84,7 +84,9 @@ const clusterStylingFind = {
   property: 'score',
   stops: [
     [0, layerColors.clustersFind.bottom],
-    [1, layerColors.clustersFind.top]]
+    [1, layerColors.clustersFind.top]
+  ],
+  default: layerColors.clustersPlan.default
 };
 
 
@@ -720,7 +722,6 @@ function find() {
   if (map.getLayer('clusters')) {
     map.setPaintProperty('clusters', 'fill-color', clusterStylingFind);
     map.setPaintProperty('clusters-outline', 'line-color', clusterStylingFind);
-  
     hideClusters();
   }
 
@@ -755,7 +756,6 @@ function explore() {
   });
 
   $('#map-announce').html(clickMsg);
-
   $('.country-name').html(capFirst(country));
   $('#country-overview').html('<h4 class="text">Country overview</h4>');
   let population = (countries[country].pop / 1e6).toFixed(2);
