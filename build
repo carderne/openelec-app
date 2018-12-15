@@ -1,7 +1,11 @@
-npm run build
+#pass either build or dev as the fist argument
+npm run $1
 
 cp src/icons/favicon-1024.png dist
 cp src/logo/oobica.png dist
+cp openelec_video.mp4 dist
 echo https://openelec.surge.sh > dist/CNAME
 
-surge dist
+if [ $1 == build ]; then
+    surge dist
+fi
