@@ -99,6 +99,11 @@ $(document).ready(init);
  * Create map and assign button click calls.
  */
 function init() {
+  // go straight to video modal if it's in the URL
+  if(window.location.href.indexOf('#modalVideo') != -1) {
+    $('#modalVideo').modal('show');
+  }
+
   createMap();
 
   $('#go-home').click(home);
