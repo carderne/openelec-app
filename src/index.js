@@ -38,6 +38,9 @@ if (process.env.NODE_ENV === 'prod') {
 // object for Mapbox GL map
 let map;
 
+// all layers are placed under this layer
+let firstSymbolId = 'place-village';
+
 // name of satellite layer to hide
 let satelliteLayer = 'mapbox-satellite';
 
@@ -154,6 +157,17 @@ function addMapLayers() {
   map.setLayoutProperty(satelliteLayer, 'visibility', 'none');
   createLayerSwitcher();
 
+  /*
+  let layers = map.getStyle().layers;
+  // Find the index of the first symbol layer in the map style
+  for (var i = 0; i < layers.length; i++) {
+    if (layers[i].type === 'symbol') {
+      firstSymbolId = layers[i].id;
+      break;
+    }
+  }
+  */
+
   map.addSource('clusters', { type: 'geojson', data: emptyGeoJSON });
   map.addLayer({
     'id': 'clusters',
@@ -163,7 +177,7 @@ function addMapLayers() {
       'fill-color': clusterStylingPlan,
       'fill-opacity': 0.5,
     }
-  });
+  }, firstSymbolId);
   map.addLayer({
     'id': 'clusters-outline',
     'type': 'line',
@@ -172,7 +186,7 @@ function addMapLayers() {
       'line-color': clusterStylingPlan,
       'line-width': 2,
     }
-  });
+  }, firstSymbolId);
 
   map.addSource('grid', { type: 'geojson', data: emptyGeoJSON });
   map.addLayer({
@@ -187,7 +201,7 @@ function addMapLayers() {
       'line-color': layerColors.grid,
       'line-width': 2
     }
-  });
+  }, firstSymbolId);
 
   map.addSource('buildings', { type: 'geojson', data: emptyGeoJSON });
   map.addLayer({
@@ -198,7 +212,7 @@ function addMapLayers() {
       'fill-color': layerColors.buildings.default,
       'fill-opacity': 0.8
     }
-  });
+  }, firstSymbolId);
 
   // Change the cursor to a pointer when the mouse is over the states layer.
   // And show hover popup
@@ -331,7 +345,7 @@ function showPlanNat(data) {
         'line-color': layerColors.network,
         'line-width': 3
       }
-    });
+    }, firstSymbolId);
   }
 
   map.getSource('clusters').setData(data.clusters);
@@ -371,7 +385,7 @@ function showPlanLoc(data) {
         'line-color': layerColors.lv,
         'line-width': 3
       }
-    });
+    }, firstSymbolId);
   }
 
   updateSummary('plan-loc', data.summary); 
