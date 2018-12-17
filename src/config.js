@@ -311,6 +311,13 @@ export const countries = {
     'access-rate': 0.294,
     'access-urban': 0.8,
     'access-rural': 0.178
+  },
+  'tanzania': {
+    'bounds': [[29.049252500, -12.376973616], [40.723047500, -0.354514384]],
+    'pop': 56376403,
+    'access-rate': 0.328,
+    'access-urban': 0.653,
+    'access-rural': 0.169
   }
 };
 

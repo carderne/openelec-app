@@ -157,17 +157,6 @@ function addMapLayers() {
   map.setLayoutProperty(satelliteLayer, 'visibility', 'none');
   createLayerSwitcher();
 
-  /*
-  let layers = map.getStyle().layers;
-  // Find the index of the first symbol layer in the map style
-  for (var i = 0; i < layers.length; i++) {
-    if (layers[i].type === 'symbol') {
-      firstSymbolId = layers[i].id;
-      break;
-    }
-  }
-  */
-
   map.addSource('clusters', { type: 'geojson', data: emptyGeoJSON });
   map.addLayer({
     'id': 'clusters',
@@ -273,19 +262,34 @@ function runModel() {
 }
 
 /**
+ * 
+ */
+function resetLoading() {
+  $('#loading-bar').modal('hide');
+  $('#loading-text').html('');
+}
+
+/**
  * Run API call for planNat.
  */
 function runPlanNat() {
-  sliderParams['plan-nat']['country'] = country;
-  sliderParams['plan-nat']['access-urban'] = countries[country]['access-urban'];
-  $.ajax({
-    url: API + 'plan_nat',
-    data: sliderParams['plan-nat'],
-    success: showPlanNat,
-    error: function () {
-      $('#loading-bar').modal('hide');
-    }
-  });
+
+  if (country == 'tanzania') {
+    $('#loading-text').html('<h5>Sorry, planning currently disabled for ' + capFirst(country) + '</h5><p>Choose another country or go to Find opportunities mode</p>');
+    setTimeout(resetLoading, 3000);
+    
+  } else {
+    sliderParams['plan-nat']['country'] = country;
+    sliderParams['plan-nat']['access-urban'] = countries[country]['access-urban'];
+    $.ajax({
+      url: API + 'plan_nat',
+      data: sliderParams['plan-nat'],
+      success: showPlanNat,
+      error: function () {
+        $('#loading-bar').modal('hide');
+      }
+    });
+  }
 }
 
 /**
@@ -685,6 +689,8 @@ function chooseCountry() {
   hide('explore');
   hide('about');
   show('countries');
+
+  zoomed = false;
 }
 
 /**
