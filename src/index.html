@@ -55,10 +55,7 @@
     <ul class="nav navbar-nav ml-auto">
       <li class="nav-item">
         <!-- Button trigger modal -->
-        <a class="nav-link" href="#" data-toggle="modal" data-target="#modalVideo">Example video</a>
-        <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-video">
-            Launch demo modal
-        </button> -->
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#modalVideo">Walkthrough</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#" id="go-about">About</a>
@@ -141,22 +138,22 @@
   <div class="row flex-fill hidden" id="explore">
 
     <!-- Left fixed pane for parameter entry -->
-    <div class="col py-3 pane">
+    <div class="col py-3 pane" id="leftPane">
       <h3 class="ml-3 hidden-sm-down text country-name"></h3>
       <button type="button" class="btn btn-primary btn-sm" id="run-model"></button>
       <button type="button" class="btn btn-secondary btn-sm" id="change-country">Change country</button>
       <div class="py-3" id="sliders"></div>
     </div>
 
-    <!-- Central flexible pane for map -->
-    <div class="col-sm-8 px-0" id="map">
+    <!-- Central flexible area for map -->
+    <div class="col-sm-7 px-0" id="map">
       <nav id="baseToggle"></nav>
       <div id='map-announce'></div>
       <div class='text-danger hidden' id='server-offline'><h6>Server offline, functionality limited.</h6></div>
     </div>
     
     <!-- Right fixed pane for summary result display -->
-    <div class="col py-3 pane">
+    <div class="col py-3 pane" id="rightPane">
       <button type="button" class="btn btn-primary btn-sm" id="download-results">Download clusters</button>
       <a id="hiddenDownload"></a>
       <div class="py-1" id="legend"></div>

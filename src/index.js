@@ -262,34 +262,19 @@ function runModel() {
 }
 
 /**
- * 
- */
-function resetLoading() {
-  $('#loading-bar').modal('hide');
-  $('#loading-text').html('');
-}
-
-/**
  * Run API call for planNat.
  */
 function runPlanNat() {
-
-  if (country == 'tanzania') {
-    $('#loading-text').html('<h5>Sorry, planning currently disabled for ' + capFirst(country) + '</h5><p>Choose another country or go to Find opportunities mode</p>');
-    setTimeout(resetLoading, 3000);
-    
-  } else {
-    sliderParams['plan-nat']['country'] = country;
-    sliderParams['plan-nat']['access-urban'] = countries[country]['access-urban'];
-    $.ajax({
-      url: API + 'plan_nat',
-      data: sliderParams['plan-nat'],
-      success: showPlanNat,
-      error: function () {
-        $('#loading-bar').modal('hide');
-      }
-    });
-  }
+  sliderParams['plan-nat']['country'] = country;
+  sliderParams['plan-nat']['access-urban'] = countries[country]['access-urban'];
+  $.ajax({
+    url: API + 'plan_nat',
+    data: sliderParams['plan-nat'],
+    success: showPlanNat,
+    error: function () {
+      $('#loading-bar').modal('hide');
+    }
+  });
 }
 
 /**
@@ -791,7 +776,8 @@ function explore() {
   $('.country-name').html(capFirst(country));
   $('#country-overview').html('<h4 class="text">Country overview</h4>');
   let population = (countries[country].pop / 1e6).toFixed(2);
-  $('#country-overview').append('<p>Population: ' + numberWithCommas(population) + ' million<br>Access rate: ' + countries[country]['access-rate']*100 + ' %');
+  let accessRate = (countries[country]['access-rate']*100).toFixed(2);
+  $('#country-overview').append('<p>Population: ' + numberWithCommas(population) + ' million<br>Access rate: ' + accessRate + ' %');
 
   countryBounds = countries[country].bounds;
   let camera = map.cameraForBounds(countryBounds, {padding: -200});
@@ -919,8 +905,8 @@ function capFirst(string) {
 function createChart(dataset) {
   // TODO make responsive
   var outerWidth = 200;
-  var outerHeight = 200;
-  var margin = { left: 50, top: 20, right: 0, bottom: 50 };
+  var outerHeight = 180;
+  var margin = { left: 50, top: 20, right: 0, bottom: 30 };
   var barPadding = 0.2;
 
   var xColumn = 'type';

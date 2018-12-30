@@ -41,6 +41,13 @@ nav {
 	background-color: #feffff;
 }
 
+/*
+#rightPane {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+*/
+
 .slider-selection {
 	background: #BABABA;
 }
@@ -179,7 +186,7 @@ div.hidden {
     border-radius: 6px;
     opacity: 0.9;
     position: absolute;
-    z-index: 1;
+    z-index: 300;
     top: -5px;
     left: 105%; 
 }
