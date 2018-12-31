@@ -30,9 +30,11 @@ const flags = importImages(require.context('./flags', false, /\.(png|jpe?g|svg)$
 let API;
 // eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === 'prod') {
-  API = 'https://openelec.rdrn.me/api/v1/';
+  // API = 'https://openelec.rdrn.me/api/v1/';
+  API = 'https://7pghcg4jch.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
 } else {
   API = 'http://127.0.0.1:5000/api/v1/';
+  // API = 'https://7pghcg4jch.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
 }
 
 // object for Mapbox GL map
@@ -68,6 +70,9 @@ const clickBtn = '<button type="button" class="btn btn-warning btn-block" id="bt
 let clusterBounds;
 let countryBounds;
 let layersAdded = false;
+
+// for backward compatibility, maintain both options
+let passFullVillageGeojson = false;
 
 // to intialise buildings layer before we have the GeoJSON
 const emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
@@ -281,12 +286,20 @@ function runPlanNat() {
  * Run API call for planLoc.
  */
 function runPlanLoc() {
-  if (sliderParams['plan-loc']['village']) {
+  let west = clusterBounds[0];
+  let south = clusterBounds[1];
+  let east = clusterBounds[2];
+  let north = clusterBounds[3];
+  let bounds = south + ', ' + west + ', ' + north + ', ' + east;
+  sliderParams['plan-loc']['bounds'] = bounds;
+
+  if (sliderParams['plan-loc']['bounds']) {
     $.ajax({
       url: API + 'plan_loc',
       data: sliderParams['plan-loc'],
+      contentType: 'application/json',
       success: showPlanLoc,
-      error: function () {
+      error: function (e) {
         $('#loading-bar').modal('hide');
       }
     });
@@ -442,7 +455,10 @@ function prepPlanLoc() {
       let villageData = osmtogeojson(osmDataAsJson);
       map.getSource('buildings').setData(villageData);
       disableClass('run-model', 'disabled');
-      sliderParams['plan-loc']['village'] = JSON.stringify(villageData);
+
+      if (passFullVillageGeojson) {
+        sliderParams['plan-loc']['village'] = JSON.stringify(villageData);
+      }
     }
   });
 
