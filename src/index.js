@@ -136,6 +136,10 @@ function init() {
     backdrop: 'static',
     show: false
   });
+
+  $('body').on('hidden.bs.modal', '.modal', function () {
+    $('video').trigger('pause');
+  });
 }
 
 /**
@@ -555,7 +559,7 @@ function updateSliders(state) {
     }
 
     sliders.append('<br><span class="ttip">' + label + ': <span class="ttiptext">' + tooltip + '</span><span id="' + sliderValId + '">' + defText + '</span> ' + unit + '</span');
-    sliders.append('<input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + sliderParams[state][name] + '"/>');
+    sliders.append('<br><input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + sliderParams[state][name] + '"/>');
 
     $('#' + sliderId).slider();
     $('#' + sliderId).on('slide', function(slideEvt) {
