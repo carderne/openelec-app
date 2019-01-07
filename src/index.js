@@ -17,6 +17,7 @@ import 'bootstrap-slider';
 import 'bootstrap-slider/dist/css/bootstrap-slider.min.css';
 
 import 'typeface-chivo';
+import JSZip from 'jszip';
 
 import './style.css';
 import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.js';
@@ -97,10 +98,17 @@ const clusterStylingFind = {
   default: layerColors.clustersPlan.default
 };
 
+// Call the Lambda API to get it loaded
+$.ajax({
+  url: API + 'warm_engines',
+  data: '',
+  success: function(data) {
+    console.log(data.message);
+  }
+});
 
 // Call init() function on DOM load
 $(document).ready(init);
-//$(window).on('load', init);
 
 /**
  * Called on DOM load.
@@ -435,7 +443,7 @@ function prepPlanLoc() {
 
   $('#map-announce').html(clickBtn);
   $('#btn-zoom-out').click(zoomToNat);
-  $('#download-results').html('Download buildings');
+  $('#download-results').html('Download results');
   map.on('mouseenter', 'clusters', function () {
     popup.remove();
   });
@@ -512,7 +520,7 @@ function zoomToNat() {
 
   disableClass('run-model', 'disabled');
   $('#map-announce').html(clickMsg);
-  $('#download-results').html('Download clusters');
+  $('#download-results').html('Download results');
 
   let state = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
   updateSliders(state);
@@ -773,6 +781,8 @@ function find() {
   }
 }
 
+let firstRun = true;
+
 /**
  * 
  */
@@ -780,15 +790,44 @@ function explore() {
   $('body').removeClass('colorbg');
   country = this.id;
 
+  $('#loading-bar').modal('show');
+  if (firstRun) {
+    $('#loading-message').html('Warming up the engines.');
+    firstRun = false;
+  }
+
+  // These can be used to store the geojsons with the static frontend
+  // Simpler to have them with the server
+  // If the user spends long enough on the front page/choosing country
+  // then the Lambda will have warmed up in time
+  // $.ajax({
+  //   url: '/static/' + country + '/clusters.geojson',
+  //   success: function(data) {
+  //     map.getSource('clusters').setData(JSON.parse(data));
+  //     $('#loading-bar').modal('hide');
+  //     $('#loading-message').html('');
+  //   }
+  // });
+  // $.ajax({
+  //   url: '/static/' + country + '/grid.geojson',
+  //   success: function(data) {
+  //     map.getSource('grid').setData(JSON.parse(data));
+  //   }
+  // });
+
   $.ajax({
     url: API + 'get_country',
     data: { 'country': country },
     success: function(data) {
       map.getSource('grid').setData(data.grid);
       map.getSource('clusters').setData(data.clusters);
+      $('#loading-bar').modal('hide');
+      $('#loading-message').html('');
     },
     error: function() {
       show('server-offline');
+      $('#loading-bar').modal('hide');
+      $('#loading-message').html('');
     }
   });
 
@@ -1046,19 +1085,29 @@ function createLayerSwitcher() {
 }
 
 function downloadResults() {
-  let target;
+  let zip = new JSZip();
   let name;
+  
   if (zoomed) { // download buildings
-    target = map.getSource('buildings');
-    name = 'buildings.geojson';
+    name = 'local_plan_' + country + '_bounds_' + clusterBounds[0] + '.zip';
+    zip.file('buildings.geojson', JSON.stringify(map.getSource('buildings')._data));
+    if (map.getSource('lv')) zip.file('lv.geojson', JSON.stringify(map.getSource('lv')._data));
+    zip.file('summary.html', summaryHtml['plan-loc']);
   } else { // download clusters
-    target = map.getSource('clusters');
-    name = 'clusters.geojson';
-  }
+    name = 'nat_' + activeModel + '_' + country + '.zip';
+    zip.file('clusters.geojson', JSON.stringify(map.getSource('clusters')._data));
+    if (activeModel == 'plan') {
+      if (map.getSource('network')) zip.file('network.geojson', JSON.stringify(map.getSource('network')._data));
+    }
+    let activeSummary = activeModel == 'plan' ? 'plan-nat' : 'find-nat';
+    zip.file('summary.html', summaryHtml[activeSummary]);
+  }  
 
-  let download = document.getElementById('hiddenDownload');
-  download.href = 'data:text/geojson;charset=utf-8,' + encodeURI(JSON.stringify(target._data));
-  download.target = '_blank';
-  download.download = name;
-  download.click();
+  zip.generateAsync({type:'base64'}).then(function (base64) {
+    let download = document.getElementById('hiddenDownload');
+    download.href='data:application/zip;base64,' + base64;
+    download.target = '_blank';
+    download.download = name;
+    download.click();
+  });
 }
