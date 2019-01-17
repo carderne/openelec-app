@@ -7,5 +7,5 @@ cp openelec_video.mp4 dist
 echo https://openelec.surge.sh > dist/CNAME
 
 if [ $1 == build ]; then
-    aws s3 sync ./dist s3://openelec.rdrn.me/ --delete
+    aws s3 sync ./dist s3://openelec.me/ --delete
 fi
