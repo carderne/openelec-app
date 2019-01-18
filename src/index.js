@@ -362,6 +362,10 @@ function showPlanNat(data) {
     }, firstSymbolId);
   }
 
+  if (data.grid) {
+    map.getSource('grid').setData(data.grid);
+  }
+
   map.getSource('clusters').setData(data.clusters);
   map.setPaintProperty('clusters', 'fill-color', clusterStylingPlan);
 
