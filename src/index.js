@@ -32,7 +32,8 @@ let API;
 // eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === 'prod') {
   // API = 'https://openelec.rdrn.me/api/v1/';
-  API = 'https://7pghcg4jch.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
+  //API = 'https://7pghcg4jch.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
+  API = 'https://zj29a081ri.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
 } else {
   API = 'http://127.0.0.1:5000/api/v1/';
   // API = 'https://7pghcg4jch.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
