@@ -311,6 +311,13 @@ export const countries = {
     'access-rate': 0.294,
     'access-urban': 0.8,
     'access-rural': 0.178
+  },
+  'burundi': {
+    'bounds': [[28.204503241, -4.525353124], [31.633190859, -2.279839647]],
+    'pop': 10520000,
+    'access-rate': 0.076,
+    'access-urban': 0.497,
+    'access-rural': 0.017
   }
   // ,
   // 'tanzania': {
