@@ -31,12 +31,11 @@ const flags = importImages(require.context('./flags', false, /\.(png|jpe?g|svg)$
 let API;
 // eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === 'prod') {
-  // API = 'https://openelec.rdrn.me/api/v1/';
-  //API = 'https://7pghcg4jch.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
-  API = 'https://zj29a081ri.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
+  API = 'https://iuqi60zdei.execute-api.us-east-1.amazonaws.com/prod/api/v1/';
+} else  if (process.env.NODE_ENV === 'stage') {
+  API = 'https://a40n495vjb.execute-api.us-east-1.amazonaws.com/stage/api/v1/';
 } else {
   API = 'http://127.0.0.1:5000/api/v1/';
-  // API = 'https://7pghcg4jch.execute-api.us-east-1.amazonaws.com/dev/api/v1/';
 }
 
 // object for Mapbox GL map

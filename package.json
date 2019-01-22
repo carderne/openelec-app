@@ -6,7 +6,8 @@
   "scripts": {
     "test": "NODE_ENV=dev webpack-dev-server --mode development",
     "dev": "NODE_ENV=dev webpack --mode development",
-    "build": "NODE_ENV=prod webpack --mode production"
+    "stage": "NODE_ENV=stage webpack --mode production",
+    "prod": "NODE_ENV=prod webpack --mode production"
   },
   "keywords": [],
   "author": "",
