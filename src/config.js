@@ -318,15 +318,49 @@ export const countries = {
     'access-rate': 0.076,
     'access-urban': 0.497,
     'access-rural': 0.017
+  },
+  'tanzania': {
+    'bounds': [[29.049252500, -12.376973616], [40.723047500, -0.354514384]],
+    'pop': 56370000,
+    'access-rate': 0.328,
+    'access-urban': 0.653,
+    'access-rural': 0.169
+  },
+  'kenya': {
+    'bounds': [[33.548264979, -4.964956591], [42.287539011, 5.305705381]],
+    'pop': 49690000,
+    'access-rate': 0.56,
+    'access-urban': 0.776,
+    'access-rural': 0.393
+  },
+  'somalia': {
+    'bounds': [[40.105438727, -1.987991680], [52.288756833, 12.330216161]],
+    'pop': 14740000,
+    'access-rate': 0.299,
+    'access-urban': 0.572,
+    'access-rural': 0.116
+  },
+  'ethiopia': {
+    'bounds': [[32.627620026, -0.106069626], [48.332146354, 18.350369746]],
+    'pop': 104900000,
+    'access-rate': 0.429,
+    'access-urban': 0.854,
+    'access-rural': 0.265
+  },
+  'senegal': {
+    'bounds': [[-17.698204090, 10.674148389], [-11.187452269, 18.325782941]],
+    'pop': 15850000,
+    'access-rate': 0.645,
+    'access-urban': 0.877,
+    'access-rural': 0.383
+  },
+  'ghana': {
+    'bounds': [[-3.906271679, 4.577887208], [1.842622619, 11.334163511]],
+    'pop': 28830000,
+    'access-rate': 0.793,
+    'access-urban': 0.898,
+    'access-rural': 0.666
   }
-  // ,
-  // 'tanzania': {
-  //   'bounds': [[29.049252500, -12.376973616], [40.723047500, -0.354514384]],
-  //   'pop': 56376403,
-  //   'access-rate': 0.328,
-  //   'access-urban': 0.653,
-  //   'access-rural': 0.169
-  // }
 };
 
 export const layerColors = {

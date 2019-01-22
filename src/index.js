@@ -135,7 +135,7 @@ function init() {
   let countryList = $('#country-list');
   for (let country in countries) {
     let countryCap = capFirst(country);
-    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card shadow" style="width: 10rem;"><img class="card-img-top" src="' + flags['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a>');
+    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card shadow my-3" style="width: 10rem;"><img class="card-img-top" src="' + flags['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a><br>');
   }
 
   $('.choose-country').click(explore);
