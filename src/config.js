@@ -297,6 +297,34 @@ export const summaryConfigs = {
 };
 
 export const countries = {
+  'burundi': {
+    'bounds': [[28.204503241, -4.525353124], [31.633190859, -2.279839647]],
+    'pop': 10520000,
+    'access-rate': 0.076,
+    'access-urban': 0.497,
+    'access-rural': 0.017
+  },
+  'ethiopia': {
+    'bounds': [[32.627620026, -0.106069626], [48.332146354, 18.350369746]],
+    'pop': 104900000,
+    'access-rate': 0.429,
+    'access-urban': 0.854,
+    'access-rural': 0.265
+  },
+  'ghana': {
+    'bounds': [[-3.906271679, 4.577887208], [1.842622619, 11.334163511]],
+    'pop': 28830000,
+    'access-rate': 0.793,
+    'access-urban': 0.898,
+    'access-rural': 0.666
+  },
+  'kenya': {
+    'bounds': [[33.548264979, -4.964956591], [42.287539011, 5.305705381]],
+    'pop': 49690000,
+    'access-rate': 0.56,
+    'access-urban': 0.776,
+    'access-rural': 0.393
+  },
   'lesotho': {
     // bounds are [W, S], [E, N]
     'bounds': [[27.0344, -30.3513], [29.1263, -28.5838]],
@@ -312,26 +340,12 @@ export const countries = {
     'access-urban': 0.8,
     'access-rural': 0.178
   },
-  'burundi': {
-    'bounds': [[28.204503241, -4.525353124], [31.633190859, -2.279839647]],
-    'pop': 10520000,
-    'access-rate': 0.076,
-    'access-urban': 0.497,
-    'access-rural': 0.017
-  },
-  'tanzania': {
-    'bounds': [[29.049252500, -12.376973616], [40.723047500, -0.354514384]],
-    'pop': 56370000,
-    'access-rate': 0.328,
-    'access-urban': 0.653,
-    'access-rural': 0.169
-  },
-  'kenya': {
-    'bounds': [[33.548264979, -4.964956591], [42.287539011, 5.305705381]],
-    'pop': 49690000,
-    'access-rate': 0.56,
-    'access-urban': 0.776,
-    'access-rural': 0.393
+  'senegal': {
+    'bounds': [[-17.698204090, 10.674148389], [-11.187452269, 18.325782941]],
+    'pop': 15850000,
+    'access-rate': 0.645,
+    'access-urban': 0.877,
+    'access-rural': 0.383
   },
   'somalia': {
     'bounds': [[40.105438727, -1.987991680], [52.288756833, 12.330216161]],
@@ -340,26 +354,19 @@ export const countries = {
     'access-urban': 0.572,
     'access-rural': 0.116
   },
-  'ethiopia': {
-    'bounds': [[32.627620026, -0.106069626], [48.332146354, 18.350369746]],
-    'pop': 104900000,
-    'access-rate': 0.429,
-    'access-urban': 0.854,
-    'access-rural': 0.265
+  'tanzania': {
+    'bounds': [[29.049252500, -12.376973616], [40.723047500, -0.354514384]],
+    'pop': 56370000,
+    'access-rate': 0.328,
+    'access-urban': 0.653,
+    'access-rural': 0.169
   },
-  'senegal': {
-    'bounds': [[-17.698204090, 10.674148389], [-11.187452269, 18.325782941]],
-    'pop': 15850000,
-    'access-rate': 0.645,
-    'access-urban': 0.877,
-    'access-rural': 0.383
-  },
-  'ghana': {
-    'bounds': [[-3.906271679, 4.577887208], [1.842622619, 11.334163511]],
-    'pop': 28830000,
-    'access-rate': 0.793,
-    'access-urban': 0.898,
-    'access-rural': 0.666
+  'zambia': {
+    'bounds': [[21.706712241, -19.101743648], [33.998362069, -7.248606732]],
+    'pop': 17090000,
+    'access-rate': 0.272,
+    'access-urban': 0.620,
+    'access-rural': 0.027
   }
 };
 

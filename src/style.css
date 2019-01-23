@@ -48,6 +48,10 @@ nav {
 }
 */
 
+.card {
+    height: 80%;
+}
+
 .slider-selection {
 	background: #BABABA;
 }
