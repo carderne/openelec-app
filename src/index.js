@@ -82,9 +82,9 @@ const emptyGeoJSON = { 'type': 'FeatureCollection', 'features': [] };
 const clusterStylingPlan = [
   'match',
   ['get', 'type'],
-  'orig', layerColors.clustersPlan.orig,
-  'new', layerColors.clustersPlan.new,
-  'og', layerColors.clustersPlan.og,
+  'densify', layerColors.clustersPlan.densify,
+  'grid', layerColors.clustersPlan.grid,
+  'offgrid', layerColors.clustersPlan.offgrid,
   layerColors.clustersPlan.default
 ];
 
@@ -664,7 +664,7 @@ function updateSummary(state, summaryData) {
 
   if (state == 'plan-nat') {
     let chartData = [
-      { 'type': 'Existing', 'pop': summaryData['orig-conn-pop'] },
+      { 'type': 'Existing', 'pop': summaryData['densify-pop'] },
       { 'type': 'New', 'pop': summaryData['new-conn-pop'] },
       { 'type': 'Off-grid', 'pop': summaryData['new-og-pop'] }
     ];
@@ -730,7 +730,7 @@ function plan() {
   }
 
   let colors = layerColors.clustersPlan;
-  let labels = {'default': 'Un-modelled', 'orig': 'Currently connected', 'new': 'New connections', 'og': 'Off-grid'};
+  let labels = {'default': 'Un-modelled', 'densify': 'Densification', 'grid': 'New connections', 'offgrid': 'Off-grid'};
   legendHtml['plan-nat'] = createLegend(colors, labels);
 
   if (!country) {
@@ -974,11 +974,11 @@ function createChart(dataset) {
 
   function colorPicker(type) {
     if (type == 'Existing') {
-      return layerColors.clustersPlan.orig;
+      return layerColors.clustersPlan.densify;
     } else if (type == 'New') {
-      return layerColors.clustersPlan.new;
+      return layerColors.clustersPlan.grid;
     } else {
-      return layerColors.clustersPlan.og;
+      return layerColors.clustersPlan.offgrid;
     }
   }
 

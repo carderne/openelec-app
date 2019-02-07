@@ -233,11 +233,11 @@ export const summaryConfigs = {
       'label': 'Total cost',
       'unit': 'USD'
     },
-    'new-conn': {
+    'new-grid': {
       'label': 'New grid villages',
       'unit': ''
     },
-    'new-og': {
+    'new-off-grid': {
       'label': 'New off-grid villages',
       'unit': ''
     },
@@ -245,7 +245,7 @@ export const summaryConfigs = {
       'label': 'Modelled pop',
       'unit': ''
     },
-    'orig-conn-pop': {
+    'densify-pop': {
       'label': 'Existing grid pop',
       'unit': ''
     },
@@ -304,13 +304,13 @@ export const countries = {
     'access-urban': 0.497,
     'access-rural': 0.017
   },
-  'ethiopia': {
-    'bounds': [[32.627620026, -0.106069626], [48.332146354, 18.350369746]],
-    'pop': 104900000,
-    'access-rate': 0.429,
-    'access-urban': 0.854,
-    'access-rural': 0.265
-  },
+  // 'ethiopia': {
+  //   'bounds': [[32.627620026, -0.106069626], [48.332146354, 18.350369746]],
+  //   'pop': 104900000,
+  //   'access-rate': 0.429,
+  //   'access-urban': 0.854,
+  //   'access-rural': 0.265
+  // },
   'ghana': {
     'bounds': [[-3.906271679, 4.577887208], [1.842622619, 11.334163511]],
     'pop': 28830000,
@@ -374,9 +374,9 @@ export const layerColors = {
   'grid': '#474747', // grey
   'clustersPlan': {
     'default': '#ffc14a', //orange
-    'orig': '#377eb8', // blue
-    'new': '#4daf4a', // green
-    'og': '#e41a1c' // red
+    'densify': '#377eb8', // blue
+    'grid': '#4daf4a', // green
+    'offgrid': '#e41a1c' // red
   },
   'clustersFind': {
     'default': '#ffc14a', //orange
