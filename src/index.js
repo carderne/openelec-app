@@ -53,6 +53,11 @@ let activeModel;
 // boolean
 let zoomed;
 
+// for dyamic (time step) modelling
+let currentStep = 1;
+let dynamic = true;
+let dynamicSummary;
+
 // keep track of the country we're looking at
 let country;
 
@@ -85,6 +90,7 @@ const clusterStylingPlan = [
   'densify', layerColors.clustersPlan.densify,
   'grid', layerColors.clustersPlan.grid,
   'offgrid', layerColors.clustersPlan.offgrid,
+  'none', layerColors.clustersPlan.none,
   layerColors.clustersPlan.default
 ];
 
@@ -131,6 +137,8 @@ function init() {
   $('#go-find').click(find);
   $('#go-find-big').click(find);
   $('#change-country').click(chooseCountry);
+  $('#prev-step').click(prevStep);
+  $('#next-step').click(nextStep);
 
   let countryList = $('#country-list');
   for (let country in countries) {
@@ -348,12 +356,49 @@ function runFindNat() {
   });
 }
 
+
+/**
+ * 
+ * @param {*} step 
+ */
+function dynamicPlanNat(step) {
+  let hiddenNetwork = [
+    'all',
+    ['<=', 'stage', step]
+  ];
+  map.setFilter('network', hiddenNetwork);
+
+  let type = 'type_' + step;
+  let clusterStylingDynamic = [
+    'match',
+    ['get', type],
+    'densify', layerColors.clustersPlan.densify,
+    'grid', layerColors.clustersPlan.grid,
+    'offgrid', layerColors.clustersPlan.offgrid,
+    'none', layerColors.clustersPlan.none,
+    layerColors.clustersPlan.default
+  ];
+  map.setPaintProperty('clusters', 'fill-color', clusterStylingDynamic);
+  map.setPaintProperty('clusters-outline', 'line-color', clusterStylingDynamic);
+
+  updateSummary('plan-nat', dynamicSummary[step]);
+  map.resize();
+}
+
+
 /**
  * Update map and summary pane with results from model.
  * 
  * @param {*} data 
  */
 function showPlanNat(data) {
+
+  if (dynamic) {
+    dynamicSummary = data.summary;
+    data.summary = data.summary[1];
+    show('dynamic-box');
+  }
+
   if (map.getSource('network')) {
     map.getSource('network').setData(data.network);
   } else {
@@ -373,13 +418,52 @@ function showPlanNat(data) {
     }, firstSymbolId);
   }
 
+  let hiddenNetwork = [
+    'all',
+    ['==', 'stage', 1]
+  ];
+  map.setFilter('network', hiddenNetwork);
+
   map.getSource('clusters').setData(data.clusters);
   map.setPaintProperty('clusters', 'fill-color', clusterStylingPlan);
 
   updateSummary('plan-nat', data.summary);
   map.resize();
+
   $('#loading-bar').modal('hide');
 }
+
+
+/**
+ * 
+ */
+function updateStep() {
+  dynamicPlanNat(currentStep);
+}
+
+
+/**
+ * 
+ */
+function prevStep() {
+  if (currentStep > 1) {
+    currentStep -= 1;
+    updateStep();
+  }
+}
+
+
+/**
+ * 
+ */
+function nextStep() {
+  if (currentStep < 4) {
+    currentStep += 1;
+    updateStep();
+  }
+}
+
+
 
 /**
  * After model run, display summary results and
@@ -741,7 +825,7 @@ function plan() {
   }
 
   let colors = layerColors.clustersPlan;
-  let labels = {'default': 'Un-modelled', 'densify': 'Densification', 'grid': 'New connections', 'offgrid': 'Off-grid'};
+  let labels = {'default': 'Un-modelled', 'densify': 'Densification', 'grid': 'New connections', 'offgrid': 'Off-grid', 'none': 'None'};
   legendHtml['plan-nat'] = createLegend(colors, labels);
 
   if (!country) {
@@ -806,25 +890,6 @@ function explore() {
     $('#loading-message').html('Warming up the engines.');
     firstRun = false;
   }
-
-  // These can be used to store the geojsons with the static frontend
-  // Simpler to have them with the server
-  // If the user spends long enough on the front page/choosing country
-  // then the Lambda will have warmed up in time
-  // $.ajax({
-  //   url: '/static/' + country + '/clusters.geojson',
-  //   success: function(data) {
-  //     map.getSource('clusters').setData(JSON.parse(data));
-  //     $('#loading-bar').modal('hide');
-  //     $('#loading-message').html('');
-  //   }
-  // });
-  // $.ajax({
-  //   url: '/static/' + country + '/grid.geojson',
-  //   success: function(data) {
-  //     map.getSource('grid').setData(JSON.parse(data));
-  //   }
-  // });
 
   $.ajax({
     url: API + 'get_country',

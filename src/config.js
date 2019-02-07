@@ -376,7 +376,8 @@ export const layerColors = {
     'default': '#ffc14a', //orange
     'densify': '#377eb8', // blue
     'grid': '#4daf4a', // green
-    'offgrid': '#e41a1c' // red
+    'offgrid': '#e41a1c', // red
+    'none': '#474747'  // grey
   },
   'clustersFind': {
     'default': '#ffc14a', //orange

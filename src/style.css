@@ -157,6 +157,24 @@ div.hidden {
     margin-bottom: 10px;
 }
 
+/* Dynamic slider container */
+#dynamic-box {
+    z-index: 1;
+    font-family: 'Open Sans', sans-serif;
+    position: absolute;
+    width: 300px;
+    top: 50px;
+    left: 50%;
+    padding: 10px;
+    margin-left: -150px; /* half width */
+    
+    background-color: #fff;
+    box-shadow:0 1px 2px rgba(0, 0, 0, 0.10);
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
 /* Legend symbols */
 .legend-square {
     display: inline-block;
