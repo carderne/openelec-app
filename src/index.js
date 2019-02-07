@@ -255,7 +255,16 @@ function mouseOverClusters(e) {
   let gdp = props.gdp.toFixed(2);
   let grid = props.grid.toFixed(2);
   let travel = props.travel.toFixed(0);
-  let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + ' USD/p<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + ' hrs</p>';
+
+  let text = '<strong>Cluster details</strong>' + '<p>ID: ' + id + '<br>Pop: ' + pop + 
+             '<br>Size: ' + area + ' km2<br>NTL: ' + ntl + '<br>GDP: ' + gdp + 
+             ' USD/p<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + 
+             ' hrs</p>';
+
+  if (props.demand !== undefined && props.demand !== null) {
+    let demand = props.demand.toFixed(0);
+    text += '<p>Demand: ' + demand + ' kWh/p/month</p>';
+  }
 
   popup.setLngLat([e.lngLat.lng, e.lngLat.lat])
     .setHTML(text)
@@ -284,6 +293,8 @@ function runModel() {
 function runPlanNat() {
   sliderParams['plan-nat']['country'] = country;
   sliderParams['plan-nat']['access-urban'] = countries[country]['access-urban'];
+  sliderParams['plan-nat']['access-rate'] = countries[country]['access-rate'];
+
   $.ajax({
     url: API + 'plan_nat',
     data: sliderParams['plan-nat'],

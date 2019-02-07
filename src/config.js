@@ -10,15 +10,15 @@ export const sliderConfigs = {
       'unit': 'km',
       'tooltip': 'Consider clusters within this distance as already connected.'
     },
-    'min-ntl': {
+    'demand-factor': {
       'type': 'single',
-      'default': '0.2',
-      'label': 'Minimum night lights connected',
-      'max': '1',
-      'min': '0',
-      'step': '0.1',
+      'default': '5',
+      'label': 'Demand factor',
+      'max': '20',
+      'min': '1',
+      'step': '1',
       'unit': '',
-      'tooltip': 'Minimum night lights value to consider a cluster already connected.'
+      'tooltip': 'Demand factor in the formula demand=factor*log(gdp)'
     },
     'min-pop': {
       'type': 'single',
@@ -50,7 +50,7 @@ export const sliderConfigs = {
       'unit': 'USD/kW',
       'tooltip': 'Installed cost of a minigrid system, excluding distribution.'
     },
-    'mg-dist-cost': {
+    'mg-lv-cost': {
       'type': 'single',
       'default': '2',
       'label': 'Minigrid dist cost',
@@ -304,13 +304,13 @@ export const countries = {
     'access-urban': 0.497,
     'access-rural': 0.017
   },
-  // 'ethiopia': {
-  //   'bounds': [[32.627620026, -0.106069626], [48.332146354, 18.350369746]],
-  //   'pop': 104900000,
-  //   'access-rate': 0.429,
-  //   'access-urban': 0.854,
-  //   'access-rural': 0.265
-  // },
+  'ethiopia': {
+    'bounds': [[32.627620026, -0.106069626], [48.332146354, 18.350369746]],
+    'pop': 104900000,
+    'access-rate': 0.429,
+    'access-urban': 0.854,
+    'access-rural': 0.265
+  },
   'ghana': {
     'bounds': [[-3.906271679, 4.577887208], [1.842622619, 11.334163511]],
     'pop': 28830000,
