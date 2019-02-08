@@ -246,7 +246,7 @@ export const summaryConfigs = {
       'unit': ''
     },
     'densify-pop': {
-      'label': 'Existing grid pop',
+      'label': 'Densify pop',
       'unit': ''
     },
     'new-conn-pop': {

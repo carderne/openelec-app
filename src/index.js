@@ -57,6 +57,7 @@ let zoomed;
 let currentStep = 1;
 let dynamic = true;
 let dynamicSummary;
+const disabledDynamic = ['ethiopia', 'kenya', 'tanzania']
 
 // keep track of the country we're looking at
 let country;
@@ -269,9 +270,9 @@ function mouseOverClusters(e) {
              ' USD/p<br>Grid dist: ' + grid + ' km<br>Travel time: ' + travel + 
              ' hrs</p>';
 
-  if (props.demand !== undefined && props.demand !== null) {
-    let demand = props.demand.toFixed(0);
-    text += '<p>Demand: ' + demand + ' kWh/p/month</p>';
+  if (props.demand !== undefined && props.coverage !== undefined) {
+    text += '<p>Demand: ' + props.demand.toFixed(0) + ' kWh/p/month' +
+            '<br>Init coverage: ' + (100 * props.coverage).toFixed(0) + ' %</p>';
   }
 
   popup.setLngLat([e.lngLat.lng, e.lngLat.lat])
@@ -295,13 +296,19 @@ function runModel() {
   }
 }
 
+
 /**
  * Run API call for planNat.
  */
 function runPlanNat() {
+  dynamic = $('#switch-dynamic').prop('checked');
+  if (disabledDynamic.includes(country)) dynamic = false;
+
   sliderParams['plan-nat']['country'] = country;
   sliderParams['plan-nat']['access-urban'] = countries[country]['access-urban'];
   sliderParams['plan-nat']['access-rate'] = countries[country]['access-rate'];
+  sliderParams['plan-nat']['dynamic'] = dynamic;
+  sliderParams['plan-nat']['mtf'] = $('#switch-mtf').prop('checked');
 
   $.ajax({
     url: API + 'plan_nat',
@@ -359,6 +366,32 @@ function runFindNat() {
 
 /**
  * 
+ */
+function prevStep() {
+  if (currentStep > 1) {
+    currentStep -= 1;
+    let currentYear = parseInt($('#step-year').html());
+    $('#step-year').html(currentYear -= 5);
+    dynamicPlanNat(currentStep);
+  }
+}
+
+
+/**
+ * 
+ */
+function nextStep() {
+  if (currentStep < 4) {
+    currentStep += 1;
+    let currentYear = parseInt($('#step-year').html());
+    $('#step-year').html(currentYear += 5);
+    dynamicPlanNat(currentStep);
+  }
+}
+
+
+/**
+ * 
  * @param {*} step 
  */
 function dynamicPlanNat(step) {
@@ -397,6 +430,10 @@ function showPlanNat(data) {
     dynamicSummary = data.summary;
     data.summary = data.summary[1];
     show('dynamic-box');
+    currentStep = 1;
+    $('#step-year').html(2025);
+  } else {
+    hide('dynamic-box');
   }
 
   if (map.getSource('network')) {
@@ -423,46 +460,17 @@ function showPlanNat(data) {
     ['==', 'stage', 1]
   ];
   map.setFilter('network', hiddenNetwork);
+  if (!dynamic) map.setFilter('network');
 
   map.getSource('clusters').setData(data.clusters);
   map.setPaintProperty('clusters', 'fill-color', clusterStylingPlan);
+  map.setPaintProperty('clusters-outline', 'line-color', clusterStylingPlan);
 
   updateSummary('plan-nat', data.summary);
   map.resize();
 
   $('#loading-bar').modal('hide');
 }
-
-
-/**
- * 
- */
-function updateStep() {
-  dynamicPlanNat(currentStep);
-}
-
-
-/**
- * 
- */
-function prevStep() {
-  if (currentStep > 1) {
-    currentStep -= 1;
-    updateStep();
-  }
-}
-
-
-/**
- * 
- */
-function nextStep() {
-  if (currentStep < 4) {
-    currentStep += 1;
-    updateStep();
-  }
-}
-
 
 
 /**
@@ -535,6 +543,7 @@ function clusterClick(e) {
 function prepPlanLoc() {
   map.fitBounds(clusterBounds, {padding: 20});
   map.setPaintProperty('clusters', 'fill-opacity', 0.1);
+  hide('dynamic-box');
 
   $('#map-announce').html(clickBtn);
   $('#btn-zoom-out').click(zoomToNat);
@@ -621,6 +630,7 @@ function zoomToNat() {
   updateSliders(state);
   $('#legend').html(legendHtml[state]);
   $('#summary').html(summaryHtml[state]);
+  if (dynamic) show('dynamic-box');
 }
 
 /**
@@ -661,8 +671,8 @@ function updateSliders(state) {
       defText = sliderParams[state][name];
     }
 
-    sliders.append('<br><span class="ttip">' + label + ': <span class="ttiptext">' + tooltip + '</span><span id="' + sliderValId + '">' + defText + '</span> ' + unit + '</span');
-    sliders.append('<br><input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + sliderParams[state][name] + '"/>');
+    sliders.append('<span class="ttip">' + label + ': <span class="ttiptext">' + tooltip + '</span><span id="' + sliderValId + '">' + defText + '</span> ' + unit + '</span>');
+    sliders.append('<br><input id="' + sliderId + '" type="text" data-slider-min="' + min + '" data-slider-max="' + max + '" data-slider-step="' + step + '" data-slider-value="' + sliderParams[state][name] + '"/><br>');
 
     $('#' + sliderId).slider();
     $('#' + sliderId).on('slide', function(slideEvt) {
@@ -735,7 +745,7 @@ function updateSummary(state, summaryData) {
   let config = summaryConfigs[state];
   let summary = $('#summary');
 
-  summary.html('<h4 class="text">Summary results</h4>');
+  summary.html('<h5 class="text">Summary results</h5>');
   summary.append('<p>');
   for (let name in config) {
     let vals = config[name];
@@ -759,7 +769,7 @@ function updateSummary(state, summaryData) {
 
   if (state == 'plan-nat') {
     let chartData = [
-      { 'type': 'Existing', 'pop': summaryData['densify-pop'] },
+      { 'type': 'Densify', 'pop': summaryData['densify-pop'] },
       { 'type': 'New', 'pop': summaryData['new-conn-pop'] },
       { 'type': 'Off-grid', 'pop': summaryData['new-og-pop'] }
     ];
@@ -775,7 +785,7 @@ function updateSummary(state, summaryData) {
  */
 function createLegend(colors, labels) {
   let legend = $('#legend');
-  legend.html('<h4 class="text">Map legend</h4>');
+  legend.html('<h5 class="text">Map legend</h5>');
   for (let row in colors) {
     let label = labels[row];
     let color = colors[row];
@@ -811,6 +821,8 @@ function plan() {
   $('#run-model').html('Run model');
   disableClass('run-model', 'disabled');
   updateSliders('plan-nat');
+
+  if (dynamic) show('dynamic-box');
 
   $('#summary').html(summaryHtml['plan-nat']);
   if (map.getLayer('network')) {
@@ -871,6 +883,7 @@ function find() {
     $('body').removeClass('colorbg');
     hide('landing');
     show('explore');
+    hide('dynamic-box');
     hide('about');
     hide('countries');
   }
@@ -884,6 +897,7 @@ let firstRun = true;
 function explore() {
   $('body').removeClass('colorbg');
   country = this.id;
+  hide('dynamic-box');
 
   $('#loading-bar').modal('show');
   if (firstRun) {
@@ -909,7 +923,7 @@ function explore() {
 
   $('#map-announce').html(clickMsg);
   $('.country-name').html(capFirst(country));
-  $('#country-overview').html('<h4 class="text">Country overview</h4>');
+  $('#country-overview').html('<h5 class="text">Country overview</h5>');
   let population = (countries[country].pop / 1e6).toFixed(2);
   let accessRate = (countries[country]['access-rate']*100).toFixed(2);
   $('#country-overview').append('<p>Population: ' + numberWithCommas(population) + ' million<br>Access rate: ' + accessRate + ' %');
@@ -1049,7 +1063,7 @@ function createChart(dataset) {
   var colorColumn = 'type';
 
   function colorPicker(type) {
-    if (type == 'Existing') {
+    if (type == 'Densify') {
       return layerColors.clustersPlan.densify;
     } else if (type == 'New') {
       return layerColors.clustersPlan.grid;
