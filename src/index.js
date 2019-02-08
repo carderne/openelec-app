@@ -770,7 +770,7 @@ function updateSummary(state, summaryData) {
   if (state == 'plan-nat') {
     let chartData = [
       { 'type': 'Densify', 'pop': summaryData['densify-pop'] },
-      { 'type': 'New', 'pop': summaryData['new-conn-pop'] },
+      { 'type': 'Grid', 'pop': summaryData['new-conn-pop'] },
       { 'type': 'Off-grid', 'pop': summaryData['new-og-pop'] }
     ];
     createChart(chartData);
@@ -1065,7 +1065,7 @@ function createChart(dataset) {
   function colorPicker(type) {
     if (type == 'Densify') {
       return layerColors.clustersPlan.densify;
-    } else if (type == 'New') {
+    } else if (type == 'Grid') {
       return layerColors.clustersPlan.grid;
     } else {
       return layerColors.clustersPlan.offgrid;
