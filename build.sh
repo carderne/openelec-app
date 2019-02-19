@@ -1,9 +1,11 @@
-#pass either build or dev as the fist argument
+#pass either dev, stage or prod as the fist argument
 npm run $1
 
 cp src/icons/favicon-1024.png dist
 cp src/logo/oobica.png dist
 cp openelec_video.mp4 dist
+cp robots.txt dist
+cp sitemap.xml dist
 echo https://openelec.surge.sh > dist/CNAME
 
 if [ $1 == stage ]; then
