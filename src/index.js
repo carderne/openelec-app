@@ -57,7 +57,7 @@ let zoomed;
 let currentStep = 1;
 let dynamic = true;
 let dynamicSummary;
-const disabledDynamic = ['ethiopia', 'kenya', 'tanzania']
+const disabledDynamic = ['ethiopia', 'kenya', 'tanzania'];
 
 // keep track of the country we're looking at
 let country;
