@@ -615,11 +615,9 @@ function buildOverpassApiUrl(overpassQuery, bbox) {
  * and show appropriate sidebar content.
  */
 function zoomToNat() {
-  countryBounds = countries[country].bounds;
-  let camera = map.cameraForBounds(countryBounds, {padding: -200});
-  map.flyTo(camera);
-  map.on('mouseenter', 'clusters', mouseOverClusters);
+  map.flyTo({'zoom': map.getZoom() - 4});
 
+  map.on('mouseenter', 'clusters', mouseOverClusters);
   map.setPaintProperty('clusters', 'fill-opacity', 0.5);
 
   disableClass('run-model', 'disabled');
