@@ -10,7 +10,7 @@
 if (process.env.NODE_ENV === 'prod') {
   module.exports = {
     API: 'https://iuqi60zdei.execute-api.us-east-1.amazonaws.com/prod/api/v1/',
-    tag: '<small>beta</beta>'
+    tag: '<small>beta</small>'
   };
 } else if (process.env.NODE_ENV === 'stage') {
   module.exports = {
