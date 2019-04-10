@@ -6,7 +6,6 @@ cp src/logo/oobica.png dist
 cp openelec_video.mp4 dist
 cp robots.txt dist
 cp sitemap.xml dist
-echo https://openelec.surge.sh > dist/CNAME
 
 if [ $1 == stage ]; then
     aws s3 sync ./dist s3://stage.openelec.me/ --delete --profile serverless

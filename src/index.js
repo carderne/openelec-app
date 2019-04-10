@@ -21,6 +21,8 @@ import JSZip from 'jszip';
 
 import './style.css';
 import { sliderConfigs, summaryConfigs, countries, layerColors } from './config.js';
+// eslint-disable-next-line no-undef
+const vars = require('./vars.js');
 
 import * as d3 from 'd3';
 
@@ -28,15 +30,7 @@ import * as d3 from 'd3';
 const flags = importImages(require.context('./flags', false, /\.(png|jpe?g|svg)$/));
 
 // Use local API URL for dev, and server for prod
-let API;
-// eslint-disable-next-line no-undef
-if (process.env.NODE_ENV === 'prod') {
-  API = 'https://iuqi60zdei.execute-api.us-east-1.amazonaws.com/prod/api/v1/';
-} else  if (process.env.NODE_ENV === 'stage') {
-  API = 'https://a40n495vjb.execute-api.us-east-1.amazonaws.com/stage/api/v1/';
-} else {
-  API = 'http://127.0.0.1:5000/api/v1/';
-}
+let API = vars.API;
 
 // object for Mapbox GL map
 let map;

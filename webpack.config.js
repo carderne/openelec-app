@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
+const vars = require('./src/vars.js');
 
 module.exports = {
   entry: './src/index.js',
@@ -17,7 +18,8 @@ module.exports = {
       /* hash: true, */
       template: './src/index.html',
       filename: path.resolve(__dirname, 'dist', 'index.html'),
-      favicon: 'src/icons/favicon.ico'
+      favicon: 'src/icons/favicon.ico',
+      tag: vars.tag
     }),
     new webpack.HashedModuleIdsPlugin(),
     new MiniCssExtractPlugin({
