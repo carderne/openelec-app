@@ -9,12 +9,12 @@
 // eslint-disable-line no-undef
 if (process.env.NODE_ENV === 'prod') {
   module.exports = {
-    API: 'https://iuqi60zdei.execute-api.us-east-1.amazonaws.com/prod/api/v1/',
+    API: 'https://b5ud8eqdja.execute-api.us-east-1.amazonaws.com/prod/api/v1/',
     tag: '<small>beta</small>'
   };
 } else if (process.env.NODE_ENV === 'stage') {
   module.exports = {
-    API: 'https://a40n495vjb.execute-api.us-east-1.amazonaws.com/stage/api/v1/',
+    API: 'https://m3a8w9y8f3.execute-api.us-east-1.amazonaws.com/stage/api/v1/',
     tag: '<big style="color:red">STAGING</big>'
   };
 } else {
