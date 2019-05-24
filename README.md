@@ -1,5 +1,6 @@
 # openelec-app
-Frontend for openelec, lives at [openelec.me](https://openelec.me). Static site that interacts with [openelec](https://github.com/carderne/openelec) API running on Labda.
+Frontend for openelec, lives at [openelec.me](https://openelec.me).  
+Static site that interacts with [openelec](https://github.com/carderne/openelec) API running on Labda.
 
 ## Installation
 Assumes the following are installed on your system.
@@ -39,8 +40,8 @@ prod: s3://your.production.bucket/
 Then the script can be used as follows:
 ```
 ./build.sh dev  # compile in development mode and serve locally
-./build stage   # compile in production mode and sync to S3 bucket
-./build prod    # ditto
+./build.sh stage   # compile in production mode and sync to S3 bucket
+./build.sh prod    # ditto
 ```
 
 ## Development
