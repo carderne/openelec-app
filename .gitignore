@@ -1,4 +1,6 @@
 *.mp4
+secrets.yml
+config.yml
 redirect/
 
 # Byte-compiled / optimized / DLL files
