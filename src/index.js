@@ -970,10 +970,17 @@ function resetAnnounce() {
  * @param {*} mode 
  */
 function activeMode(mode) {
-  disableClass('go-plan', 'btn-primary');
-  disableClass('go-find', 'btn-primary');
   if (mode) {
+    let other = mode == 'go-find' ? 'go-plan' : 'go-find';
     enableClass(mode, 'btn-primary');
+    disableClass(mode, 'btn-secondary');
+    enableClass(other, 'btn-secondary');
+    disableClass(other, 'btn-primary');
+  } else {
+    disableClass('go-plan', 'btn-secondary');
+    disableClass('go-find', 'btn-secondary');
+    enableClass('go-plan', 'btn-primary');
+    enableClass('go-find', 'btn-primary');
   }
 }
 
