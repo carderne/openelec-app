@@ -11,7 +11,7 @@ url=$(sed -n 's/^'$1': //p' config.yml)
 prof=$(sed -n 's/^profile: //p' config.yml)
 
 if [ $1 == dev ]; then
-    light-server -s dist
+    light-server -s dist -b localhost
 elif [ $1 == stage ]; then
     aws s3 sync ./dist $url --delete --profile $prof
 elif [ $1 == prod ]; then
