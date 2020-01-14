@@ -117,10 +117,9 @@ $(document).ready(init);
  */
 function init() {
   // go straight to video modal if it's in the URL
-  if(window.location.href.indexOf('#modalVideo') != -1) {
+  if (window.location.href.indexOf('#modalVideo') != -1) {
     $('#modalVideo').modal('show');
   }
-
   createMap();
 
   $('#go-home').click(home);
@@ -136,9 +135,9 @@ function init() {
   $('#next-step').click(nextStep);
 
   let countryList = $('#country-list');
-  for (let country in countries) {
-    let countryCap = capFirst(country);
-    countryList.append('<a href="#" class="choose-country" id="' + country + '"><div class="card shadow my-3" style="width: 10rem;"><img class="card-img-top" src="' + flags['flag-' + country + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a><br>');
+  for (let countryName in countries) {
+    let countryCap = capFirst(countryName);
+    countryList.append('<a href="#" class="choose-country" id="' + countryName + '"><div class="card shadow my-3" style="width: 10rem;"><img class="card-img-top" src="' + flags['flag-' + countryName + '.png'] + '" alt="flag"><div class="card-body"><h5 class="card-title">' + countryCap + '</h5></div></div></a><br>');
   }
 
   $('.choose-country').click(explore);
@@ -151,7 +150,26 @@ function init() {
   $('body').on('hidden.bs.modal', '.modal', function () {
     $('video').trigger('pause');
   });
+
+  skipToCountry();
 }
+
+/**
+ * Go straight to country if provided in URL args with ?country=<name>
+ */
+function skipToCountry() {
+  let url = new URL(window.location.href);
+  country = url.searchParams.get('country');
+  console.log(country);
+  if (country !== null) {
+    setTimeout(function() {
+      chooseCountry();
+      find();
+      explore();
+    }, 1000);
+  }
+}
+
 
 /**
  * Create the Mapbox GL map.
@@ -882,13 +900,14 @@ function find() {
 }
 
 let firstRun = true;
-
 /**
  * 
  */
 function explore() {
   $('body').removeClass('colorbg');
-  country = this.id;
+  if (typeof this !== 'undefined') {
+    country = this.id;
+  }
   hide('dynamic-box');
 
   $('#loading-bar').modal('show');
