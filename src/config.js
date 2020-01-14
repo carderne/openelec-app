@@ -333,6 +333,13 @@ export const countries = {
     'access-urban': 0.66,
     'access-rural': 0.157
   },
+  'haiti': {
+    'bounds': [[-74.4, 18], [-71.6, 20.1]],
+    'pop': 10980000,
+    'access-rate': 0.438,
+    'access-urban': 0.782,
+    'access-rural': 0.028
+  },
   'rwanda': {
     'bounds': [[28.329516540, -2.884785794], [31.431263800, -1.002637116]],
     'pop': 12210000,
