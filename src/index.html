@@ -74,6 +74,13 @@
             Combine high-resolution satellite and OpenStreetMap data with advanced optimisation strategies
             to find the best technologies and investments down to household level.
           </p>
+          <p style="color:red">
+            Note: I've turned off the backend, so any functionality relying on that infrastructure
+            (anything that involved clicking 'Run model') will not work. You can still browse and
+            filter the data for each country. If you'd like to use the model offline or get the
+            backend running, please contact me or check out the
+            <a href="https://github.com/carderne/openelec">code</a>.
+          </p>
           <hr class="my-4">
           <h3>Choose below to start exploring!</h3>
           <p class="text-muted">
@@ -135,8 +142,8 @@
     <!-- Left fixed pane for parameter entry -->
     <div class="col py-3 pane" id="leftPane">
       <h3 class="ml-3 hidden-sm-down text country-name"></h3>
-      <button type="button" class="btn btn-primary btn-sm" id="run-model"></button>
-      <button type="button" class="btn btn-secondary btn-sm" id="change-country">Change country</button>
+      <button type="button" class="btn btn-secondary btn-sm disabled" id="run-model" disabled></button>
+      <button type="button" class="btn btn-primary btn-sm" id="change-country">Change country</button>
       <div class="py-3">
         <div class="form-group">
           <span class="switch switch-sm">

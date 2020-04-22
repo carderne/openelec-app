@@ -321,3 +321,7 @@ div.hidden {
 .left {
     float: left;
 }
+
+#run-model {
+    cursor: default;
+}

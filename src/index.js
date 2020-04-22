@@ -31,6 +31,7 @@ const flags = importImages(require.context('./flags', false, /\.(png|jpe?g|svg)$
 
 // Use local API URL for dev, and server for prod
 let API = vars.API;
+let s3base = vars.S3;
 
 // object for Mapbox GL map
 let map;
@@ -100,13 +101,13 @@ const clusterStylingFind = {
 };
 
 // Call the Lambda API to get it loaded
-$.ajax({
-  url: API + 'warm_engines',
-  data: '',
-  success: function(data) {
-    console.log(data.message);
-  }
-});
+//$.ajax({
+  //url: API + 'warm_engines',
+  //data: '',
+  //success: function(data) {
+    //console.log(data.message);
+  //}
+//});
 
 // Call init() function on DOM load
 $(document).ready(init);
@@ -124,7 +125,7 @@ function init() {
 
   $('#go-home').click(home);
   $('#go-about').click(about);
-  $('#run-model').click(runModel);
+  //$('#run-model').click(runModel);
   $('#download-results').click(downloadResults);
   $('#go-plan').click(plan);
   $('#go-plan-big').click(plan);
@@ -632,7 +633,7 @@ function zoomToNat() {
   map.on('mouseenter', 'clusters', mouseOverClusters);
   map.setPaintProperty('clusters', 'fill-opacity', 0.5);
 
-  disableClass('run-model', 'disabled');
+  //disableClass('run-model', 'disabled');
   $('#map-announce').html(clickMsg);
   $('#download-results').html('Download results');
 
@@ -829,7 +830,7 @@ function plan() {
   zoomed = false;
   activeMode('go-plan');
   $('#run-model').html('Run model');
-  disableClass('run-model', 'disabled');
+  //disableClass('run-model', 'disabled');
   updateSliders('plan-nat');
 
   if (dynamic) show('dynamic-box');
@@ -869,7 +870,7 @@ function find() {
   zoomed = false;
   activeMode('go-find');
   $('#run-model').html('Run model');
-  disableClass('run-model', 'disabled');
+  //disableClass('run-model', 'disabled');
   updateSliders('find-nat');
 
   $('#summary').html(summaryHtml['find-nat']);
@@ -912,16 +913,26 @@ function explore() {
 
   $('#loading-bar').modal('show');
   if (firstRun) {
-    $('#loading-message').html('Warming up the engines.');
+    //$('#loading-message').html('Warming up the engines.');
     firstRun = false;
   }
 
   $.ajax({
-    url: API + 'get_country',
-    data: { 'country': country },
+    url: s3base + country + '/grid.geojson',
     success: function(data) {
-      map.getSource('grid').setData(data.grid);
-      map.getSource('clusters').setData(data.clusters);
+      map.getSource('grid').setData(JSON.parse(data));
+    },
+    error: function() {
+      show('server-offline');
+      $('#loading-bar').modal('hide');
+      $('#loading-message').html('');
+    }
+  });
+
+  $.ajax({
+    url: s3base + country + '/clusters.geojson',
+    success: function(data) {
+      map.getSource('clusters').setData(JSON.parse(data));
       $('#loading-bar').modal('hide');
       $('#loading-message').html('');
     },
