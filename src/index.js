@@ -31,7 +31,7 @@ const flags = importImages(require.context('./flags', false, /\.(png|jpe?g|svg)$
 
 // Use local API URL for dev, and server for prod
 let API = vars.API;
-let s3base = vars.S3;
+let dataloc = '/data/';
 
 // object for Mapbox GL map
 let map;
@@ -161,7 +161,6 @@ function init() {
 function skipToCountry() {
   let url = new URL(window.location.href);
   country = url.searchParams.get('country');
-  console.log(country);
   if (country !== null) {
     setTimeout(function() {
       chooseCountry();
@@ -918,9 +917,12 @@ function explore() {
   }
 
   $.ajax({
-    url: s3base + country + '/grid.geojson',
+    url: dataloc + country + '/grid.geojson',
     success: function(data) {
-      map.getSource('grid').setData(JSON.parse(data));
+      if (typeof data == 'string') {
+        data = JSON.parse(data);
+      }
+      map.getSource('grid').setData(data);
     },
     error: function() {
       show('server-offline');
@@ -930,9 +932,12 @@ function explore() {
   });
 
   $.ajax({
-    url: s3base + country + '/clusters.geojson',
+    url: dataloc + country + '/clusters.geojson',
     success: function(data) {
-      map.getSource('clusters').setData(JSON.parse(data));
+      if (typeof data == 'string') {
+        data = JSON.parse(data);
+      }
+      map.getSource('clusters').setData(data);
       $('#loading-bar').modal('hide');
       $('#loading-message').html('');
     },
